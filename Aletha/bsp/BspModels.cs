@@ -11,9 +11,12 @@ namespace Aletha.bsp
     
     public class Q3Entity
     {
-        public Entity entity;
+        //public Entity entity;
         public string name;
+        public string classname;
+        public string targetname;
         public int Index;
+        public Dictionary<string, object> Fields = new Dictionary<string, object>();
     }
 
     //class trace_output
@@ -30,13 +33,13 @@ namespace Aletha.bsp
     //        double distance;
     //    }
 
-    public class Entity
-    {
-        public string classname;
-        public string targetname;
-        public float? angle;
-        public Vector3 origin;
-    }
+    //public class Entity
+    //{
+    //    public string classname;
+    //    public string targetname;
+    //    public float? angle;
+    //    public Vector3 origin;
+    //}
 
     public class bsp_tree
     {
