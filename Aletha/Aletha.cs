@@ -54,7 +54,7 @@ namespace Aletha
 		// For my demo, I compiled only the shaders the map used into a single file for performance reasons
 		//var mapShaders = ['scripts/web_demo.shader'];
 
-		public static double playerDirectionMagnitude = 1.0;
+		public static float playerDirectionMagnitude = 1.0f;
 
 		// Some movement constants ripped from the Q3 Source code
 		public static float q3movement_stopspeed = 100.0f;

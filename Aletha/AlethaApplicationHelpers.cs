@@ -4,7 +4,7 @@ using System.Reflection;
 
 using OpenTK;
 using OpenTK.Input;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 using g = OpenTK.Graphics;
 
 
@@ -12,7 +12,27 @@ namespace Aletha
 {
     public partial class AlethaApplication
     {
-		void HandleKeyUp (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
+        private void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Key.C)
+            {
+                camera.playerMover.crouchDn();
+            }
+            if (e.Key == Key.Space)
+            {
+                camera.playerMover.jump();
+            }
+            if (e.Key == Key.R)
+            {
+                respawnPlayer(-1);
+            }
+            if (e.Key == Key.I)
+            {
+                camera.invert();
+            }
+        }
+
+        private void Keyboard_KeyUp(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			if (e.Key == Key.F) 
 			{
@@ -25,6 +45,10 @@ namespace Aletha
 					WindowState = WindowState.Fullscreen;
 				}
 			}
+            if (e.Key == Key.C)
+            {
+                camera.playerMover.crouchUp();
+            }
 		}
 
 
@@ -128,7 +152,7 @@ namespace Aletha
 
             // update world time a bit faster:
             WorldTime = DateTime.Now.Subtract(time_at_init);
-            this.Title = "Alphaaletha " + title + " " + WorldTime.ToString() + "vwt";
+            this.Title = "Aletha Q3 C# Player " + title + " " + WorldTime.ToString() + "vwt";
         }
 
         private int GetFps(double time)
