@@ -293,11 +293,12 @@ namespace Aletha.bsp
             }
 
             // Send the entity data back to the render thread
-            q3bsp.postMessage2(new MessageParams()
+
+            q3bsp.onMessage(new MessageParams()
             {
                 type = "entities",
                 entities = elements,
-            }, null);
+            });
         }
 
         /// <summary>

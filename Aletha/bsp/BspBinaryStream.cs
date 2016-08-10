@@ -155,7 +155,11 @@ namespace Aletha.bsp
         // Read a signed long (4 bytes) from the stream
         public long readLong()
         {
-            long l = BitConverter.ToInt64(data, (int)this.offset); // TODO: use 64bit addressing
+            long l;
+            //long l = BitConverter.ToInt64(data, (int)this.offset); // TODO: use 64bit addressing
+
+            l = (long)BitConverter.ToInt32(data, (int)this.offset);
+
             //var i = this.offset;
             //bf_wuba[0] = data.getUint8(i) & 0xff;
             //bf_wuba[1] = data.getUint8(i + 1) & 0xff;

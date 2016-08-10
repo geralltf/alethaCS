@@ -136,10 +136,10 @@ namespace Aletha.bsp
 
             BspCompiler.faces = faces;
 
-            q3bsp.postMessage2( new MessageParams(){
+            q3bsp.onMessage( new MessageParams(){
                 type = "status",
             	message = "Map geometry parsed, compiling shaders..."
-            },null);
+            });
 
             // Find associated shaders for all clusters
 
@@ -174,11 +174,11 @@ namespace Aletha.bsp
 					} 
 					else 
 					{
-                        q3bsp.postMessage2(new MessageParams() {
+                        q3bsp.onMessage(new MessageParams() {
                             type = "status",
 							message = "Tesselating face " + i.ToString() + " of " + faces.Count.ToString()
 
-                        },null);
+                        });
 
                         // Build Bezier curve
                         bsp_tess.Tesselate(face, verts, meshVerts, tesselationLevel);
@@ -259,14 +259,14 @@ namespace Aletha.bsp
 
 
             // Send the compiled vertex/index data back to the render thread
-            q3bsp.postMessage2( new MessageParams()
+            q3bsp.onMessage( new MessageParams()
             {
                 type = "geometry",
 				vertices = vertices,
 				indices = indices,
 				surfaces = shaders
 
-            },null);
+            });
         }
 	}
 }
