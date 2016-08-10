@@ -8,3 +8,7 @@ D:\projects\alpha\AlethaCS\Aletha\obj\Debug\Aletha.pdb
 D:\projects\alpha\AlethaCS\Aletha\obj\Debug\AlethaCS.csprojResolveAssemblyReference.cache
 D:\projects\alethaCS\Aletha\obj\Debug\Aletha.exe
 D:\projects\alethaCS\Aletha\obj\Debug\Aletha.pdb
+D:\projects\alethaCS\Aletha\obj\Debug\AlethaCS.csprojResolveAssemblyReference.cache
+D:\projects\alethaCS\Aletha\bin\Debug\Aletha.exe
+D:\projects\alethaCS\Aletha\bin\Debug\Aletha.pdb
+D:\projects\alethaCS\Aletha\bin\Debug\OpenTK.dll
