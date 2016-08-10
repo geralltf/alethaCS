@@ -1,0 +1,8 @@
+models/players/warbot_boss/weapons
+{
+	{
+		map models/players/warbot_boss/weapons.tga
+		rgbGen LightingDiffuse
+		blendFunc GL_ONE GL_ZERO
+	}
+}

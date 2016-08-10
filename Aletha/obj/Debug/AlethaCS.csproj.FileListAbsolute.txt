@@ -1,0 +1,8 @@
+D:\projects\alpha\AlethaCS\Aletha\bin\Debug\Aletha.exe
+D:\projects\alpha\AlethaCS\Aletha\bin\Debug\Aletha.pdb
+D:\projects\alpha\AlethaCS\Aletha\bin\Debug\OpenTK.Compatibility.dll
+D:\projects\alpha\AlethaCS\Aletha\bin\Debug\OpenTK.dll
+D:\projects\alpha\AlethaCS\Aletha\bin\Debug\OpenTK.GLControl.dll
+D:\projects\alpha\AlethaCS\Aletha\obj\Debug\Aletha.exe
+D:\projects\alpha\AlethaCS\Aletha\obj\Debug\Aletha.pdb
+D:\projects\alpha\AlethaCS\Aletha\obj\Debug\AlethaCS.csprojResolveAssemblyReference.cache

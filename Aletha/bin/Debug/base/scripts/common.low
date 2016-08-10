@@ -1,0 +1,31 @@
+textures/common/energy_portal
+{
+    qer_editorimage textures/common/qer_portal.tga
+    surfaceparm nolightmap
+    deformVertexes wave 100 sin 0 2 0 0.5
+    portal
+    tessSize 128
+    {
+        map textures/stasis/pulse4.tga
+        blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+        depthWrite
+        rgbGen wave sin 1 1 1 0.05
+        alphaGen portal 256
+        tcMod rotate 5
+        tcMod scale 0.5 0.5
+        tcMod turb 1 1 1 0.3
+    }
+    {
+        map textures/stasis/gas4.tga
+        blendFunc GL_ONE GL_ONE
+        rgbGen wave sin 0.7 0.5 1 0.2
+        tcMod scroll 0.05 0
+        tcMod scale 0.5 0.5
+    }
+    {
+        map textures/stasis/gas4.tga
+        blendFunc GL_ONE GL_ONE
+        rgbGen wave sin 1 0.3 1 0.2
+        tcMod scroll 0.15 0
+    }
+}

@@ -1,0 +1,9 @@
+{
+map		"q3tourney2"
+longname	"The Proving Grounds"
+longname_deutsch  "The Proving Grounds"
+longname_francais "The Proving Grounds"
+fraglimit	20
+type		"ffa"
+recommended	2
+}

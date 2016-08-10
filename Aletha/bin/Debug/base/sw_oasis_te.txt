@@ -1,0 +1,72 @@
+PUR3MAP ARCHIVES OF AMERICA 
+beta test 1
+
+================================================================
+Title                   : sw_oasis_te			
+Date                    : 16/Jul/2005 16:37	                			 
+pk3 name		: sw_oasis_te.pk3
+Filename		: sw_oasis_te.bsp
+Author                  : RivrStyx
+Email Address           : mailto:rivrstyx@planetquake.com
+Web			: http://www.planetquake.com/pur3maps - http://www.team-resurrection.net
+Description             : sw_oasis modified competition map
+                        
+
+Additional Credits to   : id software and Splash Damage
+
+Permission granted by Splash Damage and activision to modify Oasis for competition play
+
+================================================================
+
+===============================================================
+
+***Changes***
+1. Can jump between guns.
+2. 1 pump drains tunnels (Pump at allies start). Theres a covert door in tunnels near exit. Tunnels are connected so both wells can be used to access Old City to blow the wall or grab the flag. 
+3. When pump is build allies will spawn near the pump. If its blown they spawn at original Allies start. This spawn can be used to access tunnels to garrison since tunnels are connected...so allies have 2 spawns when flag or wall is blown to attack guns.
+4. Inside the covert door by old city is a tunnel access switch which opens tunnel door for teammates if jumping the wall or getting a uni. Also axis can open for teammates to blow pump.
+5. When Old City wall is blown the small covert door to the left is blown out also. Power to axis only door in tunnels is also disabled at this point and dor opens for allies to use.
+6. Water drains more and only a spot or 2 of water remain when drained.
+7. Ladder where MG was is moved down one room. It comes up in a room in the upper level instead of by the MG. Can still get to it the way you did before underneath by tank... *but also can access it through a door which is satchel/dynamitable at far south room in front of the garrison. (MG in garrison removed and some cans and boxes replaced for cover)
+8. *satchel/Dynamitable door that gives access from south side to lower area near tank and ladder to upper Garrison. Axis can rebuild.
+9. Axis upper garrison spawn accessible.
+10. Added door behind axis spawn in alley can be used to attack coming from the old city wall when using the upper path.
+11. Wall added where axis spawn to cut off axis easy access to tunnel side. Should help give allies a better chance at this choke point rather then axis spawning right next to it and instantly shutting it down. Exit from Axis spawn to under MG area.
+
+******** Play Description ***********
+SW_Oasis
+
+// Axis Objective Descriptions
+wm_objective_axis_desc	1	"Primary Objective:**Protect the North Pak 75mm Gun in the Axis Garrison."
+wm_objective_axis_desc	2	"Primary Objective:**Protect the South Pak 75mm Gun in the Axis Garrison."
+wm_objective_axis_desc	3	"Primary Objective:**Defend the Old City Wall from being breached."
+wm_objective_axis_desc	4	"Secondary Objective:**Defend the Old City and prevent access through tunnel door."
+wm_objective_axis_desc	5	"Secondary Objective:**Keep the Caves flooded by preventing the repair of the Oasis Water Pump."
+wm_objective_axis_desc	6	"Secondary Objective:**Repair and prevent the Allies from destroying the side Garrison Door and gaining easier access to guns."
+wm_objective_axis_desc	7	"Secondary Objective:**Prevent the Allies from establishing a Command Post at the Oasis."
+wm_objective_axis_desc	8	"Secondary Objective:**Set up a Command Post inside the Upper Garrison."
+
+// Allied Objective Descriptions
+wm_objective_allied_desc	1	"Primary Objective:**Destroy the North Pak 75mm Gun in the Axis Garrison."
+wm_objective_allied_desc	2	"Primary Objective:**Destroy the South Pak 75mm Gun in the Axis Garrison."
+wm_objective_allied_desc	3	"Primary Objective:**Breach the Old City Wall and disable the power to the tunnel door for access."
+wm_objective_allied_desc	4	"Secondary Objective:**Capture the Old City."
+wm_objective_allied_desc	5	"Secondary Objective:**Repair the Oasis Water Pump and drain the water out of the Caves."
+wm_objective_allied_desc	6	"Secondary Objective:**Destroy the side Garrison Door for easier access to guns."
+wm_objective_allied_desc	7	"Secondary Objective:**Establish a forward Command Post at the Oasis."
+wm_objective_allied_desc	8	"Secondary Objective:**Prevent the Axis from fortifying their position with a Command Post in the Upper Garrison."
+
+
+- Construction -
+
+Base                    : ETs oasis map modified for competition stopwatch play
+Editor(s) used          : GTKRadiant
+Known Bugs              : None.
+
+- Copyright / Permissions -
+
+This level is (c) 2005 Dan Dorn.
+You may not include or distribute this map in any sort of commercial product without 
+permission from the author.  You may not mass distribute this level via any 
+non-electronic means, including but not limited to compact disks, and floppy disks.
+You may not Redo/reproduce/update this map in any way without permission from the author.
