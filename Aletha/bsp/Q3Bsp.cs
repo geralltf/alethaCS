@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 using System.Threading;
 
 namespace Aletha.bsp
@@ -337,12 +337,21 @@ namespace Aletha.bsp
             /* FAST dirty async code */
             ts = new ThreadStart(() => 
             {
-                Stack<shader_p> work_items = new Stack<shader_p>(unshadedSurfaces);
+                OpenTK.Graphics.IGraphicsContext context;
+                Stack<shader_p> work_items;
+                bool processSurfaces;
 
-                while (true)
+                context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
+                context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
+                work_items = new Stack<shader_p>(unshadedSurfaces);
+                processSurfaces = true;
+
+                while (work_items.Count > 0 && processSurfaces)
                 {
+                    // PROCESS SURFACE SHADERS
+                    // as they come in until there are none left
 
-                    if (unshadedSurfaces.Count == 0)
+                    if (work_items.Count == 0)
                     { // Have we processed all surfaces?
                       // Sort to ensure correct order of transparent objects
 
@@ -361,48 +370,62 @@ namespace Aletha.bsp
 
                         //interval.cancel(); //clearInterval(interval);
 
-                        break;
-                        //return;
-                    }
-
-                    surface = work_items.Pop();
-                    //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
-
-                    String shader_name = surface.shaderName;
-                    //shader_name = shader_name.startsWith('"')?shader_name.substring(1):shader_name; // BUG
-                    shader_gl shader = q3bsp.shaders[shader_name];
-
-                    //shader_gl skyshader = q3bsp.shaders['textures/atcs/skybox_s'];
-
-
-                    if (shader == null)
-                    {
-                        surface.shader = glshading.buildDefault(surface);
-                        if (surface.geomType == 3)
-                        {
-                            surface.shader.model = true;
-                            modelSurfaces.Add(surface);
-                        }
-                        else
-                        {
-                            defaultSurfaces.Add(surface);
-                        }
+                        processSurfaces = false;
                     }
                     else
                     {
-                        surface.shader = shader;
-                        if (shader.sky == true)
+                        surface = work_items.Pop();
+                        //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
+
+                        String shader_name = surface.shaderName;
+                        //shader_name = shader_name.startsWith('"')?shader_name.substring(1):shader_name; // BUG
+                        shader_gl shader;
+
+                        if (q3bsp.shaders.ContainsKey(shader_name))
                         {
-                            
-                            //skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
+                            shader = q3bsp.shaders[shader_name];
+                        }
+
+                        else
+                        {
+                            shader = null;
+                        }
+
+                        //shader_gl skyshader = q3bsp.shaders['textures/atcs/skybox_s'];
+
+
+                        if (shader == null)
+                        {
+                            surface.shader = glshading.buildDefault(surface);
+                            if (surface.geomType == 3)
+                            {
+                                surface.shader.model = true;
+                                modelSurfaces.Add(surface);
+                            }
+                            else
+                            {
+                                defaultSurfaces.Add(surface);
+                            }
                         }
                         else
                         {
-                            effectSurfaces.Add(surface);
+                            surface.shader = shader;
+                            if (shader.sky == true)
+                            {
+
+                                //skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
+                            }
+                            else
+                            {
+                                effectSurfaces.Add(surface);
+                            }
+                            glshading.loadShaderMaps(surface, shader);
                         }
-                        glshading.loadShaderMaps(surface, shader);
                     }
+
                 }
+
+                Console.WriteLine("Processed surfaces");
             });
 
             th = new Thread(ts);
@@ -451,8 +474,7 @@ namespace Aletha.bsp
             }
         }
 
-        public static void draw(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport,
-                          Matrix4 rightViewMat, Matrix4 rightProjMat, Viewport rightViewport)
+        public static void draw(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport)
         {
             if (vertexBuffer == -1 || indexBuffer == -1) { return; } // Not ready to draw yet
 
@@ -463,36 +485,30 @@ namespace Aletha.bsp
             // Loop through all shaders, drawing all surfaces associated with them
             if (surfaces.Count > 0)
             {
-                render_default_surfaces(leftViewMat, leftProjMat, leftViewport, rightViewMat, rightProjMat, rightViewport, time);
+                render_default_surfaces(leftViewMat, leftProjMat, leftViewport, time);
 
 
                 // Model shader surfaces (can bind shader once and draw all of them very quickly)
                 if (modelSurfaces.Count > 0)
                 {
-                    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, rightViewMat, rightProjMat, rightViewport, time);
+                    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
                 }
 
-                render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, rightViewMat, rightProjMat, rightViewport, time);
+                render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
             }
 
-            render_models(leftViewMat, leftProjMat, leftViewport, rightViewMat, rightProjMat, rightViewport, time);
+            render_models(leftViewMat, leftProjMat, leftViewport, time);
         }
 
 
 
 
-        public static void render_models(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport,
-                          Matrix4 rightViewMat, Matrix4 rightProjMat, Viewport rightViewport, double time)
+        public static void render_models(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, double time)
         {
-            // barrel
-            //model.drawModel(shader, frame, Mat4_ModelView, Mat4_ModelWorld);
-
-
-            //drawModel(gl, player_1, q3_shader, q3_frame_IDX, [0, +50, 0] );
+            //TODO: porting md3 model loader soon
         }
 
-        public static void render_default_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport,
-                          Matrix4 rightViewMat, Matrix4 rightProjMat, Viewport rightViewport, float time)
+        public static void render_default_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
             // Map Geometry buffers
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
@@ -528,32 +544,10 @@ namespace Aletha.bsp
                     GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
                 }
 
-                if (rightViewMat != null)
-                {
-                    GL.ActiveTexture(TextureUnit.Texture0);
-                    GL.BindTexture(TextureTarget.Texture2D, glshading.defaultTexture);
-
-                    bsp_opengl_binders.bindShaderMatrix(shaderProgram, rightViewMat, rightProjMat);
-                    setViewport(rightViewport);
-                    for (i = 0; i < unshadedSurfaces.Count; ++i)
-                    {
-                        shader_p surface = unshadedSurfaces[i];
-                        GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
-                    }
-
-                    for (i = 0; i < defaultSurfaces.Count; ++i)
-                    {
-                        shader_p surface = defaultSurfaces[i];
-                        stage_gl stage2 = surface.shader.stages[0];
-                        GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
-                        GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
-                    }
-                }
             }
         }
 
-        public static void render_effect_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport,
-                          Matrix4 rightViewMat, Matrix4 rightProjMat, Viewport rightViewport, float time)
+        public static void render_effect_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
             // Effect surfaces
             for (int i = 0; i < effectSurfaces.Count; ++i)
@@ -582,19 +576,10 @@ namespace Aletha.bsp
                     setViewport(leftViewport);
                     // Draw all geometry that uses this textures
                     GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
-
-                    if (rightViewMat != null)
-                    {
-                        bsp_opengl_binders.bindShaderMatrix(shaderProgram, rightViewMat, rightProjMat);
-                        setViewport(rightViewport);
-                        // Draw all geometry that uses this textures
-                        GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
-                    }
                 }
             }
         }
-        public static void render_model_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport,
-                          Matrix4 rightViewMat, Matrix4 rightProjMat, Viewport rightViewport, float time)
+        public static void render_model_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
             // Setup State
             shader_gl shader = modelSurfaces[0].shader;
@@ -606,6 +591,7 @@ namespace Aletha.bsp
 
             bsp_opengl_binders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
             setViewport(leftViewport);
+
             for (int i = 0; i < modelSurfaces.Count; ++i)
             {
                 shader_p surface = modelSurfaces[i];
@@ -614,18 +600,6 @@ namespace Aletha.bsp
                 GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
             }
 
-            if (rightViewMat != null)
-            {
-                bsp_opengl_binders.bindShaderMatrix(shaderProgram, rightViewMat, rightProjMat);
-                setViewport(rightViewport);
-                for (int i = 0; i < modelSurfaces.Count; ++i)
-                {
-                    var surface = modelSurfaces[i];
-                    stage_gl stage2 = surface.shader.stages[0];
-                    GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
-                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
-                }
-            }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 using Aletha.bsp;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -31,6 +31,10 @@ namespace Aletha
             defaultTexture = -1;
             texMat = Matrix4.Identity; // mat4.create()
             defaultProgram = null;
+
+            defaultShader = buildDefault(null);
+
+            defaultProgram = compileShaderProgram(Config.q3bsp_default_vertex, Config.q3bsp_default_fragment);
         }
 
 
@@ -61,7 +65,7 @@ namespace Aletha
                     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 GL.BindTexture(TextureTarget.Texture2D, defau);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (isPowerOf2 ? (int)TextureMinFilter.LinearMipmapNearest : (int)TextureMinFilter.Linear));
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 
@@ -86,12 +90,13 @@ namespace Aletha
                     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 GL.BindTexture(TextureTarget.Texture2D, defau);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (isPowerOf2 ? (int)TextureMinFilter.LinearMipmapNearest : (int)TextureMinFilter.Linear));
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 
                 if (isPowerOf2) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             });
+
             // Load default stage
             defaultShader = buildDefault(null);
         }
@@ -346,7 +351,7 @@ namespace Aletha
                   System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
               GL.BindTexture(TextureTarget.Texture2D, texture);
-              GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
+              GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
               GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (isPowerOf2 ? (int)TextureMinFilter.LinearMipmapNearest : (int)TextureMinFilter.Linear));
               GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 
@@ -378,7 +383,7 @@ namespace Aletha
         int texture = GL.GenTexture();
 
         GL.BindTexture(TextureTarget.Texture2D, texture);
-        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 1, 1, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
+        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 1, 1, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Rgba, PixelType.UnsignedByte, data);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
         GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -421,12 +426,12 @@ namespace Aletha
             stage = defaultShader.stages[0];
         }
 
-        if (stage.animFreq != null && stage.animFreq != 0)
+        if (stage.animFreq.HasValue && stage.animFreq != 0)
         {
             // Texture animation seems like a natural place for setInterval, but that approach has proved error prone. 
             // It can easily get out of sync with other effects (like rgbGen pulses and whatnot) which can give a 
             // jittery or flat out wrong appearance. Doing it this way ensures all effects are synced.
-            float ff = time * (float)stage.animFreq;
+            float ff = time * (float)stage.animFreq.Value;
 
             //var animFrame = ff.floor() % stage.animTexture.length;
             stage.texture = stage.animTexture[stage.animFrame]; // stage.animTexture.animFrame;
@@ -506,9 +511,15 @@ namespace Aletha
         GL.CompileShader(fragmentShader);
         String si;
 
-            //var xf = GL.getShaderParameter(fragmentShader, RenderingContext.COMPILE_STATUS);
+        int i;
+        int attrib;
+        int uniform;
+        int attribCount;
+        int uniformCount;
+
+        //var xf = GL.getShaderParameter(fragmentShader, RenderingContext.COMPILE_STATUS);
         si = GL.GetShaderInfoLog(fragmentShader);
-            //if (!(xf != null && xf == true))
+        //if (!(xf != null && xf == true))
 
         if (!string.IsNullOrEmpty(si.Trim()))
         {
@@ -589,32 +600,65 @@ namespace Aletha
         shader_prog.attrib = new Dictionary<string, int>();
         shader_prog.uniform = new Dictionary<string, int>();
 
-        //int i;
-        //int attrib;
-        //int uniform;
-        //int attribCount;
-        //int uniformCount;
+        // SHADER PROGRAM INTROSPECTION
+            
+        GL.GetProgramInterface(shaderProgram, ProgramInterface.ProgramInput, ProgramInterfaceParameter.ActiveResources, out attribCount);
+        GL.GetProgramInterface(shaderProgram, ProgramInterface.Uniform, ProgramInterfaceParameter.ActiveResources, out uniformCount);
 
-        //attribCount = GL.getProgramParameter(shaderProgram, RenderingContext.ACTIVE_ATTRIBUTES);
+        string name;
+        ProgramProperty[] properties;
+        int[] values;
+        int length;
+        StringBuilder nameBuilder;
 
-        //for (i = 0; i < attribCount; i++)
-        //{
-        //    attrib = GL.GetActiveAttrib(shaderProgram, i);
+        properties = new ProgramProperty[]
+        {
+            ProgramProperty.NameLength,
+            ProgramProperty.Type,
+            ProgramProperty.ArraySize
+        };
 
-        //    shader_prog.attrib[attrib.name] = gl.getAttribLocation(shaderProgram, attrib.name);
-        //}
+        values = new int[properties.Length];
+        nameBuilder = new StringBuilder();
 
-        //uniformCount = gl.getProgramParameter(shaderProgram, RenderingContext.ACTIVE_UNIFORMS);
-        //shader_prog.uniform = { };
+        for (i = 0; i < attribCount; i++)
+        {
+            GL.GetProgramResource(shaderProgram, ProgramInterface.ProgramInput, i, properties.Length, properties, values.Length, out length, values);
 
-        //for (i = 0; i < uniformCount; i++)
-        //{
-        //    uniform = gl.getActiveUniform(shaderProgram, i);
+#pragma warning disable
+            GL.GetProgramResourceName(shaderProgram, ProgramInterface.ProgramInput, i, 256, out length, nameBuilder);
+#pragma warning restore
 
-        //    shader_prog.uniform[uniform.name] = gl.getUniformLocation(shaderProgram, uniform.name);
-        //}
+            name = nameBuilder.ToString();
 
-        return shader_prog;
+            shader_prog.attrib[name] = GL.GetAttribLocation(shaderProgram, name);
+        }
+
+            for (i = 0; i < uniformCount; i++)
+            {
+                GL.GetProgramResource(shaderProgram, ProgramInterface.Uniform, i, properties.Length, properties, values.Length, out length, values);
+
+#pragma warning disable
+                GL.GetProgramResourceName(shaderProgram, ProgramInterface.Uniform, i, 256, out length, nameBuilder);
+#pragma warning restore
+
+                name = nameBuilder.ToString();
+
+                shader_prog.uniform[name] = GL.GetUniformLocation(shaderProgram, name);
+            }
+
+            //attribCount = GL.getProgramParameter(shaderProgram, RenderingContext.ACTIVE_ATTRIBUTES);
+            //uniformCount = gl.getProgramParameter(shaderProgram, RenderingContext.ACTIVE_UNIFORMS);
+            //shader_prog.uniform = { };
+
+            //for (i = 0; i < uniformCount; i++)
+            //{
+            //    uniform = gl.getActiveUniform(shaderProgram, i);
+
+            //    shader_prog.uniform[uniform.name] = gl.getUniformLocation(shaderProgram, uniform.name);
+            //}
+
+            return shader_prog;
     }
 }
 }

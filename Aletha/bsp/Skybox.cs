@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Aletha.bsp;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Aletha
 {
@@ -543,7 +543,7 @@ namespace Aletha
 
                 //gl.texImage2D(types[i], 0, GL_RGB, pImage->columns(), pImage->rows(), 0, RenderingContext.RGBA,
                 //     RenderingContext.UNSIGNED_BYTE, blob.data());
-                GL.TexImage2D(TextureTarget.TextureCubeMap, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
+                GL.TexImage2D(TextureTarget.TextureCubeMap, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
 
                 GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
                 GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);

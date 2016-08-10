@@ -26,6 +26,9 @@ namespace Aletha.bsp
         {
             string responseText = System.IO.File.ReadAllText(url);
 
+            AlethaApplication.incReqests();
+            AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
+
             q3shader.parse(url, responseText, onload);
 
             //fetch(url, "text/plain").then((request)8

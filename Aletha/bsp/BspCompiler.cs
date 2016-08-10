@@ -82,12 +82,15 @@ namespace Aletha.bsp
             ms = new MemoryStream(data);
             ms.Position = 0;
 
+            AlethaApplication.incReqests();
+            AlethaApplication.update_progress_bar(AlethaApplication.request_number, mapURL);
 
             q3bsp.onMessage(new MessageParams()
             {
                 type = "status",
                 message = "Map downloaded, parsing level geometry..."
             });
+
 
             bsp_parser_ibsp_v46.parse(new binary_stream(ms), tesselationLevel, (bsp_header_t header) => {
 
@@ -98,6 +101,7 @@ namespace Aletha.bsp
                 });
                 
             });
+
 
 
             //fetch(mapURL, 'arraybuffer').then((request)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 using System.Drawing;
 
 namespace Aletha
@@ -69,12 +69,26 @@ namespace Aletha
                     //        onloadComplete(texture,image);
                     //      });
 
-                    image = new Bitmap(url);
+                    try
+                    {
+
+
+                        image = new Bitmap(url);
+
+                        AlethaApplication.incReqests();
+                        AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
+
+                        onloadComplete(texture, image);
+
+                        Console.WriteLine(url);
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine("[warning] could not find texture '{0}'", url);
+                    }
                 }
 
-                onloadComplete(texture, image);
 
-                Console.WriteLine(url);
                 //fetch_update(url);
             }
         }

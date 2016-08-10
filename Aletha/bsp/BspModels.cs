@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Aletha.bsp
 {
@@ -145,7 +145,7 @@ namespace Aletha.bsp
     public class stage_gl
     {
         public string map;
-        public double animFreq;
+        public double? animFreq;
         public int texture;
         public List<int> animTexture = new List<int>();
         public shader_prog_t program;

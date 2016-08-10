@@ -97,10 +97,11 @@ namespace Aletha.bsp
 
             //tree.visData = visData;
 
-            //   postMessage2({
-            //       "type": 'bsp',
-            //"bsp": tree
-            //   },null);
+            q3bsp.onMessage(new MessageParams()
+            {
+                type = "bsp",
+                bsp = tree
+            });
         }
 
         /// <summary>
