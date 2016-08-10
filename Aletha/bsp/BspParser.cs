@@ -179,8 +179,9 @@ namespace Aletha.bsp
 
                 string g1 = m.Groups[0].Value;
 
-                Entity entity = new Entity()
+                Q3Entity entity = new Q3Entity()
                 {
+                    name = "",
                     classname = "unknown"
                 };
 
@@ -192,36 +193,68 @@ namespace Aletha.bsp
                     Match m1 = ma0[j];
 
                     MatchCollection ma1 = patt_match_entities.Matches(m1.Groups[0].Value); //.groups([0])[0]).toList();
-
+                    
+                    /* Parse the key value tokens */
                     for (int i = 0; i < ma1.Count; i++)
                     {
                         Match m2 = ma1[i];
 
                         string g0 = m2.Groups[1].Value; //([1, 2]);
 
-                        String entity_key = m2.Groups[0].Value;
-                        String entity_value = m2.Groups[1].Value;
+                        string entity_key = m2.Groups[1].Value;
+                        string entity_value = m2.Groups[2].Value;
+
                         entity_key = entity_key.StartsWith("\"") ? entity_key.Substring(1) : entity_key;
                         entity_key = entity_key.EndsWith("\"") ? entity_key.Substring(0, entity_key.Length - 1) : entity_key;
                         entity_value = entity_value.StartsWith("\"") ? entity_value.Substring(1) : entity_value;
                         entity_value = entity_value.EndsWith("\"") ? entity_value.Substring(0, entity_value.Length - 1) : entity_value;
 
-                        //switch (entity_key)
-                        //{
-                        //    case "origin":
-                        //        patt_match_origin_coord.allMatches(entity_value).forEach((Match m) => {
-                        //            var coord = m.groups([1, 2, 3]);
-                        //            entity[entity_key] = [double.Parse(coord[0]), double.Parse(coord[1]), double.Parse(coord[2])];
-                        //        });
-                        //    break;
-                        //  case "angle":
-                        //        entity.
-                        //        entity[entity_key] = double.Parse(entity_value);
-                        //    break;
-                        //  default:
-                        //        entity[entity_key] = entity_value;
-                        //        break;
-                        //}
+                        switch (entity_key)
+                        {
+                            case "origin":
+                                MatchCollection component_matches = patt_match_origin_coord.Matches(entity_value);
+
+                                Match m_components = component_matches[0];
+                                float x = float.Parse(m_components.Groups[1].Value);
+                                float y = float.Parse(m_components.Groups[2].Value);
+                                float z = float.Parse(m_components.Groups[3].Value);
+
+                                Vector3 origin = new Vector3(x, y, z);
+
+                                entity.Fields[entity_key] = origin;
+
+                                //patt_match_origin_coord.allMatches(entity_value).forEach((Match m) => {
+                                //    var coord = m.groups([1, 2, 3]);
+                                //    entity[entity_key] = [double.Parse(coord[0]), double.Parse(coord[1]), double.Parse(coord[2])];
+                                //});
+
+                                break;
+                          case "angle":
+                                double angle = double.Parse(entity_value);
+
+                                entity.Fields[entity_key] = angle;
+
+                                //entity[entity_key] = double.Parse(entity_value);
+                                break;
+                          default:
+                                //entity[entity_key] = entity_value;
+                                entity.Fields[entity_key] = entity_value;
+
+                                switch (entity_key)
+                                {
+                                    case "targetname":
+                                        entity.targetname = entity_value;
+                                        break;
+                                    case "classname":
+                                        entity.classname = entity_value;
+                                        break;
+                                    case "name":
+                                        entity.name = entity_value;
+                                        break;
+                                }
+
+                                break;
+                        }
                     }
         
                     if (entity.targetname != null)
@@ -237,12 +270,13 @@ namespace Aletha.bsp
                         //    name = entity.targetname
                         //}; // targets
 
-                        elements.Add(new Q3Entity()
-                        {
-                            Index = id,
-                            entity = entity,
-                            name = entity.targetname
-                        });
+                        //elements.Add(new Q3Entity()
+                        //{
+                        //    Index = id,
+                            
+                        //    entity = entity.entity,
+                        //    name = entity.targetname
+                        //});
 
                     }
                     //if (elements[entity.classname] == null)
@@ -250,12 +284,7 @@ namespace Aletha.bsp
                     //    elements[entity.classname] = null;
                     //}
 
-                    elements.Add(new Q3Entity()
-                    {
-                        name = entity.classname,
-                        entity = entity,
-                        Index = id
-                    });
+                    elements.Add(entity);
 
                     //elements[entity.classname] = entity;
 
