@@ -6,3 +6,5 @@ D:\projects\alpha\AlethaCS\Aletha\bin\Debug\OpenTK.GLControl.dll
 D:\projects\alpha\AlethaCS\Aletha\obj\Debug\Aletha.exe
 D:\projects\alpha\AlethaCS\Aletha\obj\Debug\Aletha.pdb
 D:\projects\alpha\AlethaCS\Aletha\obj\Debug\AlethaCS.csprojResolveAssemblyReference.cache
+D:\projects\alethaCS\Aletha\obj\Debug\Aletha.exe
+D:\projects\alethaCS\Aletha\obj\Debug\Aletha.pdb
