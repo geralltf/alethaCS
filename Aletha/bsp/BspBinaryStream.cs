@@ -267,7 +267,7 @@ namespace Aletha.bsp
             Buffer.BlockCopy(this.data, (int)this.offset, chrset, 0, (int)number_of_bytes); // TODO: use 64bit addressing
                                                                                             //Uint8List chrset = this.bytes.asUint8List(this.offset, number_of_bytes);
 
-            result = UTF8Encoding.UTF8.GetString(chrset);
+            result = UTF8Encoding.UTF8.GetString(chrset).Replace("\0", string.Empty);
 
             //List<byte> characters = new List<byte>();
             
