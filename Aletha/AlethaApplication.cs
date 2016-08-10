@@ -174,17 +174,29 @@ namespace Aletha
                 Q3Entity spawnPoint = spawns.First(e => e.Index == index);
                 //Entity spawnPoint = q3bsp.entities[spawn_point_param_name];
 
-                float zAngle = -((spawnPoint.entity.angle.HasValue ? spawnPoint.entity.angle.Value : 0.0f)) 
-                                    * ((float)Math.PI / 180.0f) + ((float)Math.PI * 0.5f); // Negative angle in radians + 90 degrees
-                float xAngle = 0.0f;
+                float zAngle;
+                float xAngle;
+
+                if (spawnPoint.Fields.ContainsKey("angle"))
+                {
+                    zAngle = (float)spawnPoint.Fields["angle"];
+                }
+                else
+                {
+                    zAngle = 0.0f;
+                }
+
+                zAngle = -(zAngle);
+                zAngle *= ((float)Math.PI / 180.0f) + ((float)Math.PI * 0.5f); // Negative angle in radians + 90 degrees
+
+                xAngle = 0.0f;
 
                 Vector3 rotation = new Vector3(xAngle, 0.0f, zAngle);
 
-                camera.setOrigin(new Vector3(
-                    spawnPoint.entity.origin.X,
-                    spawnPoint.entity.origin.Y,
-                    spawnPoint.entity.origin.Z + 30 // Start a little ways above the floor) [
-                ), rotation);
+                Vector3 origin = (Vector3)spawnPoint.Fields["origin"];
+                origin.Z += 30; // Start a little ways above the floor
+
+                camera.setOrigin(origin, rotation);
 
                 camera.velocity = Vector3.Zero;
 
