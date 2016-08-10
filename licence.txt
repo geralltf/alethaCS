@@ -1,4 +1,4 @@
-Copyright (c) 2016, RealityDaemon and tojicode
+Copyright (c) 2016, RealityDaemon, tojicode
 
 Mostly ported from javascript see: http://media.tojicode.com/q3bsp/ 
 so please see and respect tojicode's license as well as the following GNU license:
