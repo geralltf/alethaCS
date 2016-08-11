@@ -64,7 +64,6 @@
     <Compile Include="Const.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Aletha.cs" />
-    <Compile Include="scene\Camera.cs" />
     <Compile Include="scene\cubemap.cs" />
     <Compile Include="scene\cubemap_texture_one.cs" />
     <Compile Include="scene\cubemap_texture_six.cs" />

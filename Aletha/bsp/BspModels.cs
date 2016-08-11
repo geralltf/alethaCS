@@ -9,7 +9,39 @@ using System.Runtime.InteropServices;
 namespace Aletha.bsp
 {
 
-    
+    public class MessageParams
+    {
+        public string type;
+        public string message;
+        public string url;
+
+        public Dictionary<long, bool> visibleSurfaces;
+
+        public List<Q3Entity> entities;
+        public bsp_tree bsp;
+
+        // type = Geometry
+        public float[] vertices;
+        public uint[] indices;
+        public List<lightmap_t> lightmaps;
+        public int size;
+
+        public List<shader_t> shaders;
+
+        public List<shader_p> surfaces;
+
+        public int tesselationLevel;
+
+        public string[] sources;
+        public long traceId;
+        public string data;
+        public Vector3 pos;
+        public Vector3 start;
+        public Vector3 end;
+        public float radius;
+        public bool slide;
+    }
+
     public class Q3Entity
     {
         //public Entity entity;

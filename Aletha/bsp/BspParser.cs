@@ -162,7 +162,7 @@ namespace Aletha.bsp
             string entities;
             List<Q3Entity> elements;
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             entities = src.ReadString(0, lump.length);
 
@@ -336,7 +336,7 @@ namespace Aletha.bsp
             List<shader_p> elements = new List<shader_p>();
             shader_p shader;
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             for (var i = 0; i < count; ++i)
             {
@@ -380,7 +380,7 @@ namespace Aletha.bsp
             List<lightmap_rect_t> lightmapRects = new List<lightmap_rect_t>();
             Vector3 rgb = Vector3.Zero;
             
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             for (int i = 0; i < count; ++i)
             {
                 byte[] elements = new byte[lightmapSize * 4];
@@ -441,7 +441,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 44;
             List<Vertex> elements = new List<Vertex>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             for (int i = 0; i < count; ++i)
             {
 
@@ -464,7 +464,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 4;
             List<int> meshVerts = new List<int>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             for (int i = 0; i < count; ++i)
             {
                 meshVerts.Add(src.ReadInt32()); // ReadInt64
@@ -485,7 +485,7 @@ namespace Aletha.bsp
             List<Face> faces = new List<Face>();
             Face face;
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             for (var i = 0; i < faceCount; ++i)
             {
@@ -523,7 +523,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 16;
             List<Plane> elements = new List<Plane>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             for (int i = 0; i < count; ++i)
             {
                 Plane p = new Plane();
@@ -546,7 +546,7 @@ namespace Aletha.bsp
             List<bsp_tree_node> elements = new List<bsp_tree_node>();
             bsp_tree_node node;
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             for (int i = 0; i < count; ++i)
             {
@@ -571,7 +571,7 @@ namespace Aletha.bsp
             List<Leaf> elements = new List<Leaf>();
             Leaf leave;
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             for (var i = 0; i < count; ++i)
             {
                 leave = new Leaf()
@@ -600,7 +600,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 4;
             List<long> elements = new List<long>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             for (int i = 0; i < count; ++i)
             {
                 elements.Add(src.ReadInt32()); // ReadInt64
@@ -619,7 +619,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 12;
             List<Brush> elements = new List<Brush>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             for (int i = 0; i < count; ++i)
             {
@@ -642,7 +642,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 4;
             List<long> elements = new List<long>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             for (int i = 0; i < count; ++i)
             {
@@ -661,7 +661,7 @@ namespace Aletha.bsp
             int count = (int)lump.length / 8;
             List<BrushSide> elements = new List<BrushSide>();
 
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
 
             for (int i = 0; i < count; ++i)
             {
@@ -681,7 +681,7 @@ namespace Aletha.bsp
         /// </summary>
         private static VisData readVisData(bsp_header_lump_t lump, BinaryStreamReader src)
         {
-            src.seek(lump.offset);
+            src.Seek(lump.offset);
             int vecCount = src.ReadInt32(); // ReadInt64
             int size = src.ReadInt32();
 

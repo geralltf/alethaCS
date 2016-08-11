@@ -13,47 +13,10 @@ namespace Aletha.bsp
     public delegate void OnSurfacesParsed(List<shader_p> surfaces);
     public delegate void OnBspLoadComplete(q3bsptree tree);
 
-    public class MessageParams
-    {
-        public string type;
-        public string message;
-        public string url;
 
-        public Dictionary<long, bool> visibleSurfaces;
-
-        public List<Q3Entity> entities;
-        public bsp_tree bsp;
-
-        // type = Geometry
-        public float[] vertices;
-        public uint[] indices;
-        public List<lightmap_t> lightmaps;
-        public int size;
-
-        public List<shader_t> shaders;
-
-        public List<shader_p> surfaces;
-
-        public int tesselationLevel;
-
-        public string[] sources;
-        public long traceId;
-        public string data;
-        public Vector3 pos;
-        public Vector3 start;
-        public Vector3 end;
-        public float radius;
-        public bool slide;
-    }
-
-    /*
- * q3bsp
- */
     public class q3bsp
     {
-        /*TODO: process using different Worker thread. Prroblem Worker needs its own 
-  memory and cant clone objects or work off shared data.*/
-        //Worker worker;
+
         public static void postMessage2(MessageParams @params, MessageParams replay)
         {
 
@@ -90,37 +53,6 @@ namespace Aletha.bsp
             //fetch_update("Plese Wait");
         }
 
-        public static void init_worker()
-        {
-            //context["onq3message"]  = onmessage;
-
-            //  worker = new Worker('tech3.worker.js');
-            //  worker.onMessage.listen((params) 
-            //  {
-            //    print('message baxck from wokrer');
-            //    //_onmessage(params);
-            //    //q3bsp.onMessage(params);
-            //  });
-            //  worker.onError.listen((error) {
-            //    print('[tech3.worker] line: ' + error.lineno.toString() + ', ' + error.message);
-            //  });
-
-
-            //worker.postMessage('hi');
-            // Spawn the web worker      ////// note code in bsp_compiler and bsp_parser needs to be in separate worker
-            //this.worker = new Worker('js/q3bsp_worker.js');
-            //this.worker.onmessage = (msg) {
-            //   q3bsp.onMessage(msg);
-            //};
-            //this.worker.onerror = (msg) {
-            //  window.console.error('Line: ' + msg.lineno + ', ' + msg.message);
-            //};
-
-
-        }
-
-
-        //public static var onload = null;
         public static OnBspLoadComplete onbsp = null;
         public static OnEntitiesParsed onentitiesloaded = null;
         public static OnSurfacesParsed onsurfaces = null;
@@ -407,8 +339,9 @@ namespace Aletha.bsp
 
 
                     if (work_items.Count == 0)
-                    { // Have we processed all surfaces?
-                      // Sort to ensure correct order of transparent objects
+                    { 
+                        // Have we processed all surfaces?
+                        // Sort to ensure correct order of transparent objects
 
                         effectSurfaces.Sort((shader_p a, shader_p b) =>
                         {
@@ -416,14 +349,6 @@ namespace Aletha.bsp
                             // TODO: Sort by state here to cut down on changes?
                             return order; //(order == 0 ? 1 : order);
                         });
-
-                        //effectSurfaces.sort((shader_p a, shader_p b) {
-                        //    int order = a.shader.sort - b.shader.sort;
-                        //    // TODO: Sort by state here to cut down on changes?
-                        //    return order; //(order == 0 ? 1 : order);
-                        //});
-
-                        //interval.cancel(); //clearInterval(interval);
 
                         processSurfaces = false;
                     }
@@ -496,10 +421,10 @@ namespace Aletha.bsp
 
 
                 // Model shader surfaces (can bind shader once and draw all of them very quickly)
-                //if (modelSurfaces.Count > 0)
-                //{
-                //    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
-                //}
+                if (modelSurfaces.Count > 0)
+                {
+                    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+                }
 
 
                 //BUG: at the moment with effect surfaces
