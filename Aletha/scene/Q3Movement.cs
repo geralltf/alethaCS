@@ -10,7 +10,7 @@ namespace Aletha
 
 
     /*
- * q3movement.js - Handles player movement through a bsp structure
+ * q3movement.cs - Handles player movement through a bsp structure
  */
 
     // Much of this file is a simplified/dumbed-down version of the Q3 player movement code
@@ -21,10 +21,10 @@ namespace Aletha
         private q3bsptree bsp;
         private TraceOutput groundTrace;
         public bool crouched = false;
-        public TestCamera camera;
+        public SceneCamera camera;
         private Vector3 crouchAmount = Vector3.UnitZ * 15.0f;
 
-        public Q3Movement(TestCamera camera, q3bsptree bsp)
+        public Q3Movement(SceneCamera camera, q3bsptree bsp)
         {
             this.bsp = bsp;
 
@@ -96,7 +96,11 @@ namespace Aletha
 
             this.groundCheck();
 
-            direction.Normalize();
+            if(direction != Vector3.Zero)
+            {
+                direction.Normalize();
+            }
+                
 
             if (camera.onGround)
             {

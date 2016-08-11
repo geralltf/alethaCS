@@ -443,8 +443,8 @@ namespace X3D.Engine
 			//xAngle = 0.0;
 		}
 
-		public void setOrigin(Vector3 origin, Vector3 rotation)
-		{
+        public void SetOrigin(Vector3 origin, Vector3 rotation)
+        {
 			Position = Origin = origin;
 			Rotation = OriginRotation = rotation;
 			Orientation = Quaternion.Identity;
