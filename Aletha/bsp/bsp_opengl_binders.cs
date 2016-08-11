@@ -14,7 +14,6 @@ namespace Aletha.bsp
 
         public static void bindShaderMatrix(shader_prog_t shader, Matrix4 modelViewMat, Matrix4 projectionMat)
         {
-            // Set uniforms
             GL.UniformMatrix4(shader.uniform["modelViewMat"], false, ref modelViewMat);
             GL.UniformMatrix4(shader.uniform["projectionMat"], false, ref projectionMat);
         }
@@ -37,7 +36,7 @@ namespace Aletha.bsp
                                        VertexAttribPointerType.Float,
                                        false,
                                        Config.q3bsp_vertex_stride,
-                                       3 * 4);
+                                       3 * sizeof(float));
             }
 
             if (shader.attrib.ContainsKey("lightCoord"))
@@ -48,7 +47,7 @@ namespace Aletha.bsp
                                        VertexAttribPointerType.Float,
                                        false,
                                        Config.q3bsp_vertex_stride,
-                                       5 * 4);
+                                       5 * sizeof(float));
             }
 
             if (shader.attrib.ContainsKey("normal"))
@@ -59,7 +58,7 @@ namespace Aletha.bsp
                     VertexAttribPointerType.Float,
                     false,
                     Config.q3bsp_vertex_stride,
-                    7 * 4);
+                    7 * sizeof(float));
             }
 
             if (shader.attrib.ContainsKey("color"))
@@ -70,7 +69,7 @@ namespace Aletha.bsp
                     VertexAttribPointerType.Float,
                     false,
                     Config.q3bsp_vertex_stride,
-                    10 * 4);
+                    10 * sizeof(float));
             }
         }
 

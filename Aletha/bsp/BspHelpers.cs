@@ -11,23 +11,25 @@ namespace Aletha.bsp
         /// <summary>
         /// Scale up an RGB color
         /// </summary>
-        public static byte[] brightnessAdjust(byte[] color, float factor)
+        public static Vector3 brightnessAdjust(Vector3 color, float factor)
         {
             float scale = 1.0f, temp = 0.0f;
 
-            color[0] = (byte)((float)color[0] * factor);
-            color[1] = (byte)((float)color[1] * factor);
-            color[2] = (byte)((float)color[2] * factor);
+            Vector3 c = new Vector3(color);
 
-            if (color[0] > 255 && (temp = 255 / color[0]) < scale) { scale = temp; }
-            if (color[1] > 255 && (temp = 255 / color[1]) < scale) { scale = temp; }
-            if (color[2] > 255 && (temp = 255 / color[2]) < scale) { scale = temp; }
+            c.X *= factor;
+            c.Y *= factor;
+            c.Z *= factor;
 
-            color[0] = (byte)((float)color[0] * scale);
-            color[1] = (byte)((float)color[1] * scale);
-            color[2] = (byte)((float)color[2] * scale);
+            if (c.X > 255f && (temp = 255f / c.X) < scale) { scale = temp; }
+            if (c.Y > 255f && (temp = 255f / c.Y) < scale) { scale = temp; }
+            if (c.Z > 255f && (temp = 255f / c.Z) < scale) { scale = temp; }
 
-            return color;
+            c.X = (float)c.X * scale;
+            c.Y = (float)c.Y * scale;
+            c.Z = (float)c.Z * scale;
+
+            return c;
         }
 
         public static Vector4 brightnessAdjustVertex(Vector4 color, float factor)
@@ -49,7 +51,7 @@ namespace Aletha.bsp
             return color;
         }
 
-        public static Vector4 colorToVec(ulong color)
+        public static Vector4 colorToVec(uint color)
         {
             return new Vector4(
                 (color & 0xFF) / 0xFF,

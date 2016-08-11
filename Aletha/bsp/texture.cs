@@ -82,11 +82,11 @@ namespace Aletha
 
                         Console.WriteLine(url);
                     //}
-                    //catch(Exception ex)
+                    //catch
                     //{
                     //    Console.WriteLine("[warning] could not find texture '{0}'", url);
                     //}
-                }
+            }
 
 
                 //fetch_update(url);

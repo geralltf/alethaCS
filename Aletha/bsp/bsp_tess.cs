@@ -11,12 +11,12 @@ namespace Aletha.bsp
         /// <summary>
         /// Build Bezier curve
         /// </summary>
-        public static void Tesselate(Face face, List<Vertex> verts, List<long> meshVerts, int level)
+        public static void Tesselate(Face face, List<Vertex> verts, List<int> meshVerts, int level)
         {
             if (level < 0) level = 0;
 
             int i, j, row, col, px, py;
-            long off = face.vertex;
+            int off = face.vertex;
             //int count = face.vertCount;
 
             int L1 = level + 1;
@@ -32,7 +32,7 @@ namespace Aletha.bsp
                 for (px = 0; px < face.size.x - 2; px += 2)
                 {
 
-                    long rowOff = (py * face.size.x);
+                    int rowOff = (py * face.size.x);
 
                     // Store control points
                     Vertex c0 = verts[(int)(off + rowOff + px)], 
@@ -51,7 +51,7 @@ namespace Aletha.bsp
                            c7 = verts[(int)(off + rowOff + px + 1)], 
                            c8 = verts[(int)(off + rowOff + px + 2)];
 
-                    var indexOff = face.vertCount;
+                    int indexOff = face.vertCount;
                     face.vertCount += L1 * L1;
 
                     // Tesselate!

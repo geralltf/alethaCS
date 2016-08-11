@@ -76,6 +76,11 @@ namespace Aletha.bsp
             MemoryStream ms;
             string file;
 
+            if (tesselationLevel <= 0)
+            {
+                tesselationLevel = 5;
+            }
+
             file = Config.q3bsp_base_folder + mapURL;
 
             data = System.IO.File.ReadAllBytes(file);
@@ -92,7 +97,7 @@ namespace Aletha.bsp
             });
 
 
-            bsp_parser_ibsp_v46.parse(new binary_stream(ms), tesselationLevel, (bsp_header_t header) => {
+            bsp_parser_ibsp_v46.parse(new BinaryStreamReader(ms), tesselationLevel, (bsp_header_t header) => {
 
                 q3bsp.onMessage(new MessageParams()
                 {
@@ -131,7 +136,7 @@ namespace Aletha.bsp
 
         public static void compileMap   ( List<Vertex> verts, 
 		                     List<Face> faces, 
-		                     List<long> meshVerts, 
+		                     List<int> meshVerts, 
 		                     List<lightmap_rect_t> lightmaps, 
 		                     List<shader_p> shaders, 
 		                     int tesselationLevel ) 
@@ -208,7 +213,7 @@ namespace Aletha.bsp
 
             // Compile index list
             //Uint16List indices = new Uint16List(0);
-            List<int> lst_indices = new List<int>();
+            List<uint> lst_indices = new List<uint>();
 
 			for(int i = 0; i <  shaders.Count; ++i) 
 			{
@@ -225,7 +230,7 @@ namespace Aletha.bsp
 
 						for(int k = 0; k < face.meshVertCount; ++k) 
 						{
-							lst_indices.Add((int)(face.vertex + meshVerts[(int)face.meshVert + k]));
+							lst_indices.Add((uint)(face.vertex + meshVerts[face.meshVert + k]));
 						}
 						shader.elementCount += (int)face.meshVertCount;
 					}
@@ -233,7 +238,7 @@ namespace Aletha.bsp
 				shader.faces = null; // Don't need to send this to the render thread.
 			}
 
-            int[] indices = lst_indices.ToArray();
+            uint[] indices = lst_indices.ToArray();
 
             //         indices = new Uint16List(lst_indices.length);
             //indices.setAll(0,lst_indices);

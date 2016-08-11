@@ -82,8 +82,8 @@ namespace Aletha.bsp
     public class shader_p
     {
         public string shaderName;
-        public long flags;
-        public long contents;
+        public int flags;
+        public int contents;
         public shader_gl shader;
         public List<Face> faces;
         public int indexOffset;
@@ -279,29 +279,29 @@ namespace Aletha.bsp
     {
         public String company;
         public String tag;
-        public ulong version;
+        public int version;
         public List<bsp_header_lump_t> lumps;
     }
     public class bsp_header_lump_t
     {
-        public ulong offset;
-        public ulong length;
+        public uint offset;
+        public uint length;
     }
     public class Leaf
     {
-        public long cluster;
-        public long area;
-        public long[] min;
-        public long[] max;
-        public long leafFace;
-        public long leafFaceCount;
-        public long leafBrush;
-        public long leafBrushCount;
+        public int cluster;
+        public int area;
+        public int[] min;
+        public int[] max;
+        public int leafFace;
+        public int leafFaceCount;
+        public int leafBrush;
+        public int leafBrushCount;
     }
     public class lightmap_rect_t
     {
-        public int x, y;
-        public int xScale, yScale;
+        public float x, y;
+        public float xScale, yScale;
     }
     public class lightmap_t
     {
@@ -323,9 +323,9 @@ namespace Aletha.bsp
 
     public struct vector2_int64_t
     {
-        public long x;
-        public long y;
-        public vector2_int64_t(long x, long y)
+        public int x;
+        public int y;
+        public vector2_int64_t(int x, int y)
         {
             this.x = x;
             this.y = y;
@@ -334,10 +334,10 @@ namespace Aletha.bsp
 
     public struct vector3_int64_t
     {
-        public long x;
-        public long y;
-        public long z;
-        public vector3_int64_t(long x, long y, long z)
+        public int x;
+        public int y;
+        public int z;
+        public vector3_int64_t(int x, int y, int z)
         {
             this.x = x;
             this.y = y;
@@ -347,14 +347,14 @@ namespace Aletha.bsp
 
     public class Face
     {
-        public long shader;
-        public long effect;
-        public long type;
-        public long vertex;
-        public long vertCount;
-        public long meshVert;
-        public long meshVertCount;
-        public long lightmap;
+        public int shader;
+        public int effect;
+        public int type;
+        public int vertex;
+        public int vertCount;
+        public int meshVert;
+        public int meshVertCount;
+        public int lightmap;
         public vector2_int64_t lmStart;
         public vector2_int64_t lmSize;
         public Vector3 lmOrigin;

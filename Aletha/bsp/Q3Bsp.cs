@@ -19,14 +19,14 @@ namespace Aletha.bsp
         public string message;
         public string url;
 
-        public Dictionary<long,bool> visibleSurfaces;
+        public Dictionary<long, bool> visibleSurfaces;
 
         public List<Q3Entity> entities;
         public bsp_tree bsp;
 
         // type = Geometry
         public float[] vertices;
-        public int[] indices;
+        public uint[] indices;
         public List<lightmap_t> lightmaps;
         public int size;
 
@@ -59,27 +59,27 @@ namespace Aletha.bsp
 
             string type = @params.type;
 
-            if(replay != null)
+            if (replay != null)
             {
 
 
-                if(type == "worker")
+                if (type == "worker")
                 {
-                   q3bsp.onMessage(replay);
-                   BspCompiler._onmessage(replay);
+                    q3bsp.onMessage(replay);
+                    BspCompiler._onmessage(replay);
 
-                   return;
+                    return;
                 }
             }
-            switch(type) 
+            switch (type)
             {
                 case "geometry":
 
-                //worker.postMessage(params);
-                //_onmessage(params);
-                //q3bsp.onMessage(params);
-                //return;
-                break;
+                    //worker.postMessage(params);
+                    //_onmessage(params);
+                    //q3bsp.onMessage(params);
+                    //return;
+                    break;
             }
 
 
@@ -159,7 +159,7 @@ namespace Aletha.bsp
             vertexBuffer = -1;
             indexBuffer = -1;
             indexCount = 0;
-            lightmap = glshading.createSolidTexture( new Vector4(255, 255, 255, 255) );
+            lightmap = glshading.createSolidTexture(new Vector4(255, 255, 255, 255));
             surfaces = null;
             shaders = new Dictionary<string, shader_gl>();
 
@@ -239,7 +239,7 @@ namespace Aletha.bsp
                     //onLoadStatus(msg.message);
                     break;
                 default:
-                    throw new Exception( "Unexpected message type: " + msg.type);
+                    throw new Exception("Unexpected message type: " + msg.type);
             }
         }
 
@@ -249,16 +249,17 @@ namespace Aletha.bsp
             {
                 tesselationLevel = 5;
             }
-            q3bsp.postMessage2( new MessageParams() {
+            q3bsp.postMessage2(new MessageParams()
+            {
                 type = "load",
                 url = "../" + Config.q3bsp_base_folder + "/" + url,
                 tesselationLevel = tesselationLevel
-            },null);
+            }, null);
         }
 
         public static void loadShaders(String[] urls)
         {
-            for (var i = 0; i < urls.Length; ++i)
+            for (int i = 0; i < urls.Length; ++i)
             {
                 urls[i] = Config.q3bsp_base_folder + '/' + urls[i];
             }
@@ -335,7 +336,7 @@ namespace Aletha.bsp
             }
 
             /* FAST dirty async code */
-            ts = new ThreadStart(() => 
+            ts = new ThreadStart(() =>
             {
                 OpenTK.Graphics.IGraphicsContext context;
                 Stack<shader_p> work_items;
@@ -351,7 +352,61 @@ namespace Aletha.bsp
                     // PROCESS SURFACE SHADERS
                     // as they come in until there are none left
 
-                    if (unshadedSurfaces.Count == 0)
+
+
+
+                    surface = work_items.Pop();
+                    unshadedSurfaces.RemoveAt(0);
+
+                    //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
+
+                    String shader_name = surface.shaderName;
+                    //shader_name = shader_name.startsWith('"')?shader_name.substring(1):shader_name; // BUG
+                    shader_gl shader;
+
+                    if (q3bsp.shaders.ContainsKey(shader_name))
+                    {
+                        shader = q3bsp.shaders[shader_name];
+                    }
+
+                    else
+                    {
+                        shader = null;
+                    }
+
+                    //shader_gl skyshader = q3bsp.shaders['textures/atcs/skybox_s'];
+
+
+                    if (shader == null)
+                    {
+                        surface.shader = glshading.buildDefault(surface);
+                        if (surface.geomType == 3)
+                        {
+                            surface.shader.model = true;
+                            modelSurfaces.Add(surface);
+                        }
+                        else
+                        {
+                            defaultSurfaces.Add(surface);
+                        }
+                    }
+                    else
+                    {
+                        surface.shader = shader;
+                        if (shader.sky == true)
+                        {
+
+                            skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
+                        }
+                        else
+                        {
+                            effectSurfaces.Add(surface);
+                        }
+                        glshading.loadShaderMaps(surface, shader);
+                    }
+
+
+                    if (work_items.Count == 0)
                     { // Have we processed all surfaces?
                       // Sort to ensure correct order of transparent objects
 
@@ -372,60 +427,9 @@ namespace Aletha.bsp
 
                         processSurfaces = false;
                     }
-                    else
-                    {
-                        surface = work_items.Pop();
-                        unshadedSurfaces.RemoveAt(0);
-
-                        //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
-
-                        String shader_name = surface.shaderName;
-                        //shader_name = shader_name.startsWith('"')?shader_name.substring(1):shader_name; // BUG
-                        shader_gl shader;
-
-                        if (q3bsp.shaders.ContainsKey(shader_name))
-                        {
-                            shader = q3bsp.shaders[shader_name];
-                        }
-
-                        else
-                        {
-                            shader = null;
-                        }
-
-                        //shader_gl skyshader = q3bsp.shaders['textures/atcs/skybox_s'];
-
-
-                        if (shader == null)
-                        {
-                            surface.shader = glshading.buildDefault(surface);
-                            if (surface.geomType == 3)
-                            {
-                                surface.shader.model = true;
-                                modelSurfaces.Add(surface);
-                            }
-                            else
-                            {
-                                defaultSurfaces.Add(surface);
-                            }
-                        }
-                        else
-                        {
-                            surface.shader = shader;
-                            if (shader.sky == true)
-                            {
-
-                                skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
-                            }
-                            else
-                            {
-                                effectSurfaces.Add(surface);
-                            }
-                            glshading.loadShaderMaps(surface, shader);
-                        }
-                    }
 
                 }
+
 
                 Console.WriteLine("Processed surfaces");
             });
@@ -440,13 +444,14 @@ namespace Aletha.bsp
 
         public static void updateVisibility(Vector3 pos)
         {
-            postMessage2( new MessageParams(){
+            postMessage2(new MessageParams()
+            {
                 type = "visibility",
                 pos = pos
-            },null);
+            }, null);
         }
 
-        public static void setVisibility(Dictionary<long,bool> visibilityList)
+        public static void setVisibility(Dictionary<long, bool> visibilityList)
         {
             if (surfaces.Count > 0)
             {
@@ -541,14 +546,14 @@ namespace Aletha.bsp
                 for (i = 0; i < unshadedSurfaces.Count; ++i)
                 {
                     shader_p surface = unshadedSurfaces[i];
-                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
+                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
                 }
                 for (i = 0; i < defaultSurfaces.Count; ++i)
                 {
                     shader_p surface = defaultSurfaces[i];
                     stage_gl stage2 = surface.shader.stages[0];
                     GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
-                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
+                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
                 }
 
             }
@@ -576,13 +581,17 @@ namespace Aletha.bsp
                 {
                     stage_gl stage = shader.stages[j];
 
-                    var shaderProgram = glshading.setShaderStage(shader, stage, time);
+                    shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
+
                     if (shaderProgram == null) { continue; }
+
                     bsp_opengl_binders.bindShaderAttribs(shaderProgram);
                     bsp_opengl_binders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+
                     setViewport(leftViewport);
+
                     // Draw all geometry that uses this textures
-                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
+                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
                 }
             }
         }
@@ -604,7 +613,7 @@ namespace Aletha.bsp
                 shader_p surface = modelSurfaces[i];
                 stage_gl stage2 = surface.shader.stages[0];
                 GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
-                GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
+                GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
             }
 
         }

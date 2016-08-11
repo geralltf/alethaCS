@@ -59,7 +59,7 @@ namespace Aletha.bsp
                 Leaf leaf = this.bsp.leaves[(int)(-(nodeIdx + 1))];
                 for (var i = 0; i < leaf.leafBrushCount; i++)
                 {
-                    Brush brush = this.bsp.brushes[(int)(this.bsp.leafBrushes[(int)(leaf.leafBrush + i)])];
+                    Brush brush = this.bsp.brushes[(int)(this.bsp.leafBrushes[(leaf.leafBrush + i)])];
                     shader_p surface = this.bsp.surfaces[(int)brush.shader];
 
                     if (brush.brushSideCount > 0 && surface.contents != 0) // surface['contents'] & 1 

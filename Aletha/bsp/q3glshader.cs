@@ -32,9 +32,9 @@ namespace Aletha
             texMat = Matrix4.Identity; // mat4.create()
             defaultProgram = null;
 
-            defaultShader = buildDefault(null);
+            //defaultShader = buildDefault(null);
 
-            defaultProgram = compileShaderProgram(Config.q3bsp_default_vertex, Config.q3bsp_default_fragment);
+            //defaultProgram = compileShaderProgram(Config.q3bsp_default_vertex, Config.q3bsp_default_fragment);
         }
 
 
@@ -510,8 +510,6 @@ namespace Aletha
             String si;
 
             int i;
-            int attrib;
-            int uniform;
             int attribCount;
             int uniformCount;
 

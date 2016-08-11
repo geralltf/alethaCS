@@ -11,15 +11,8 @@ namespace Aletha
 
     public class bsp_opengl_builders
     {
-        public static void buildBuffers(float[] vertices, int[] indices)
+        public static void buildBuffers(float[] vertices, uint[] indices)
         {
-            // Float32List
-            // Uint16List
-            //Float32List verts = new Float32List(vertices.length);
-            //verts.setAll(0, vertices);
-
-            int[] ind = indices.ToArray();
-
             GL.GenBuffers(1, out q3bsp.vertexBuffer);
             GL.GenBuffers(1, out q3bsp.indexBuffer);
 
@@ -27,7 +20,7 @@ namespace Aletha
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, q3bsp.indexBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ind.Length * sizeof(int)), ind, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
 
             q3bsp.indexCount = indices.Length;
         }

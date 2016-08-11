@@ -14,12 +14,13 @@ namespace Aletha
         one_tex
     }
 
-
+    public delegate void OnSkymapPartLoadComplete(dynamic image, int target);
+    public delegate void OnSkymapLoadComplete(dynamic texture, int target, OnTextueLoad onloadComplete);
 
     public class skybox
     {
-        private skybox_type type;
-        private cubemap map;
+        //private skybox_type type;
+        //private cubemap map;
         private int skymap;
 
         static int skyboxBuffer = -1;
@@ -29,7 +30,7 @@ namespace Aletha
         public static shader_gl skyShader;
         //static bool has_skyparams;
 
-        public String skybox_env_url = Config.q3bsp_base_folder + "/env/" + Config.mapName + "/";
+        public string skybox_env_url = Config.q3bsp_base_folder + "/env/" + Config.mapName + "/";
 
         public skybox()
         {
@@ -37,7 +38,7 @@ namespace Aletha
             //skyboxIndexBuffer = null;
             //skyboxIndexCount = 0;
             skyboxMat = Matrix4.Identity;
-            map = null;
+            //map = null;
         }
 
         public static void loadSkyTexture(shader_gl shader,
@@ -104,7 +105,7 @@ namespace Aletha
 
             // determine type of skybox: number of textures to load
 
-            sky.type = skybox_type.one_tex;
+            //sky.type = skybox_type.one_tex;
 
 
             buildSkyboxbuffers();
@@ -201,15 +202,6 @@ namespace Aletha
                             //GL.DrawElements(RenderingContext.TRIANGLES, skyboxIndexCount, RenderingContext.UNSIGNED_SHORT, 0);
                             GL.DrawElements(BeginMode.Triangles, skyboxIndexCount, DrawElementsType.UnsignedInt, 0);
 
-                            //                  if (rightViewMat != null) {
-                            //                    skybox.bindSkyMatrix(shaderProgram, rightViewMat, rightProjMat);
-                            //                    q3bsp.setViewport(rightViewport);
-                            //                      
-                            //                      gl.drawElements(RenderingContext.TRIANGLES, 
-                            //                          skyboxIndexCount, 
-                            //                              RenderingContext.UNSIGNED_SHORT, 
-                            //                              0);
-                            //                  }
                         }
                         if (shader.stages.Count == 0)
                         {
@@ -244,6 +236,10 @@ namespace Aletha
         static void bindSkyMatrix(shader_prog_t shader, Matrix4 modelViewMat, Matrix4 projectionMat)
         {
             skyboxMat = modelViewMat; //mat4.set(modelViewMat, this.skyboxMat);
+                                      //skyboxMat = Matrix4.Identity;
+                                      //skyboxMat = new Matrix4(modelViewMat.Row0, modelViewMat.Row1, modelViewMat.Row2, modelViewMat.Row3);
+
+
 
             // Clear out the translation components
             skyboxMat.M12 = 0.0f;
@@ -344,218 +340,4 @@ namespace Aletha
         }
     }
 
-    public abstract class cubemap
-    {
-        //render();
-
-    }
-
-    delegate void OnSkymapPartLoadComplete(dynamic image, int target);
-    delegate void OnSkymapLoadComplete(dynamic texture, int target, OnTextueLoad onloadComplete);
-
-    public class cubemap_texture_six : cubemap // disable DEPTH_TEST to render behind scene
-    {
-        private static int skymap;
-        //private static dynamic back, down, front, left, right, up;
-        private static System.Drawing.Bitmap xpos, xneg, ypos, yneg, zpos, zneg;
-        private static int num_loaded = 0;
-
-        public static void LoadComplete(int index, TextureTarget target, OnTextueLoad onloadComplete) // OnSkymapLoadComplete
-        {
-            int skybox = GL.GenTexture();
-            index = skybox;
-            skymap = skybox;
-            System.Drawing.Imaging.BitmapData xposd, yposd, zposd, xnegd, ynegd, znegd;
-
-
-
-            //gl.enable(RenderingContext.TEXTURE_CUBE_MAP);
-            GL.BindTexture(TextureTarget.TextureCubeMap, skybox);
-
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-
-            //gl.TexParameter(RenderingContext.TEXTURE_CUBE_MAP, RenderingContext.TEXTURE_WRAP_R, RenderingContext.CLAMP_TO_EDGE);
-
-            int level = 0;
-            PixelInternalFormat format = PixelInternalFormat.Rgba;
-            PixelFormat pformat = PixelFormat.Rgba;
-            PixelType type = PixelType.UnsignedByte;            
-
-            xposd = texture.UnlockBitmap(xpos);
-            yposd = texture.UnlockBitmap(ypos);
-            zposd = texture.UnlockBitmap(zpos);
-            xnegd = texture.UnlockBitmap(xneg);
-            ynegd = texture.UnlockBitmap(yneg);
-            znegd = texture.UnlockBitmap(zneg);
-
-            // gl.texImage2D(RenderingContext.TEXTURE_2D, 0, RenderingContext.RGBA, RenderingContext.RGBA, RenderingContext.UNSIGNED_BYTE, image);
-            GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX, level, format, xpos.Width, xpos.Height, 0, pformat, type, xposd.Scan0);
-            GL.TexImage2D(TextureTarget.TextureCubeMapNegativeX, level, format, xneg.Width, xneg.Height, 0, pformat, type, xnegd.Scan0);
-            GL.TexImage2D(TextureTarget.TextureCubeMapPositiveY, level, format, ypos.Width, ypos.Height, 0, pformat, type, yposd.Scan0);
-            GL.TexImage2D(TextureTarget.TextureCubeMapNegativeY, level, format, yneg.Width, yneg.Height, 0, pformat, type, ynegd.Scan0);
-            GL.TexImage2D(TextureTarget.TextureCubeMapPositiveZ, level, format, zpos.Width, zpos.Height, 0, pformat, type, zposd.Scan0);
-            GL.TexImage2D(TextureTarget.TextureCubeMapNegativeZ, level, format, zneg.Width, zneg.Height, 0, pformat, type, znegd.Scan0);
-
-            onloadComplete(skybox);
-        }
-
-        private static void PartLoadComplete(System.Drawing.Bitmap image, TextureTarget target)
-        {
-            switch (target)
-            {
-                case TextureTarget.TextureCubeMapPositiveX:
-                    xpos = image;
-                    break;
-                case TextureTarget.TextureCubeMapNegativeX:
-                    xneg = image;
-                    break;
-                case TextureTarget.TextureCubeMapPositiveY:
-                    ypos = image;
-                    break;
-                case TextureTarget.TextureCubeMapNegativeY:
-                    yneg = image;
-                    break;
-                case TextureTarget.TextureCubeMapPositiveZ:
-                    zpos = image;
-                    break;
-                case TextureTarget.TextureCubeMapNegativeZ:
-                    zneg = image;
-                    break;
-            }
-        }
-
-        public static void load(String back_url,
-            String down_url,
-            String front_url,
-            String left_url,
-            String right_url,
-            String up_url,
-            OnTextueLoad onloading,
-            OnTextueLoad onloadComplete)
-        {
-
-
-            // DISPATCH requests
-
-            //onloading(skymap);
-
-            //ASYNC loading of skybox right here
-            texture.fetch_texture(back_url, (t) => { }, (int t, System.Drawing.Bitmap image) =>
-            {
-                TextureTarget target = TextureTarget.TextureCubeMapNegativeZ;
-
-                PartLoadComplete(image, target);
-
-                num_loaded++;
-                if (num_loaded == 6)
-                {
-                    LoadComplete(-1, target, onloadComplete);
-                }
-            });
-
-            texture.fetch_texture(down_url, (t) => { }, (int t, System.Drawing.Bitmap image) =>
-            {
-                TextureTarget target = TextureTarget.TextureCubeMapPositiveX;
-
-                PartLoadComplete(image, target);
-
-                num_loaded++;
-                if (num_loaded == 6)
-                {
-                    LoadComplete(t, target, onloadComplete);
-                }
-            });
-
-            texture.fetch_texture(front_url, (t) => { }, (int t, System.Drawing.Bitmap image) =>
-            {
-                TextureTarget target = TextureTarget.TextureCubeMapNegativeX;
-
-                PartLoadComplete(image, target);
-
-                num_loaded++;
-                if (num_loaded == 6)
-                {
-                    LoadComplete(t, target, onloadComplete);
-                }
-            });
-
-            texture.fetch_texture(left_url, (t) => { }, (int t, System.Drawing.Bitmap image) =>
-            {
-                TextureTarget target = TextureTarget.TextureCubeMapPositiveY;
-
-                PartLoadComplete(image, target);
-
-                num_loaded++;
-                if (num_loaded == 6)
-                {
-                    LoadComplete(t, target, onloadComplete);
-                }
-            });
-
-            texture.fetch_texture(right_url, (t) => { }, (int t, System.Drawing.Bitmap image) =>
-            {
-                TextureTarget target = TextureTarget.TextureCubeMapNegativeY;
-
-                PartLoadComplete(image, target);
-
-                num_loaded++;
-                if (num_loaded == 6)
-                {
-                    LoadComplete(t, target, onloadComplete);
-                }
-            });
-
-            texture.fetch_texture(up_url, (t) => { }, (int t, System.Drawing.Bitmap image) =>
-            {
-                TextureTarget target = TextureTarget.TextureCubeMapPositiveZ;
-
-                PartLoadComplete(image, target);
-
-                num_loaded++;
-                if (num_loaded == 6)
-                {
-                    LoadComplete(t, target, onloadComplete);
-                }
-            });
-        }
-    }
-
-    public class cubemap_texture_one : cubemap
-    {
-        //Texture skybox;
-
-        public static void load(String url, OnTextueLoad onloading, OnTextueLoad onloadComplete)
-        {
-            texture.fetch_texture(url, (int skybox) =>
-            {
-                onloading(skybox);
-            },
-            (int skybox, System.Drawing.Bitmap image) =>
-            {
-                bool isPowerOf2 = false;
-                System.Drawing.Imaging.BitmapData pixelData;
-
-                pixelData = texture.UnlockBitmap(image);
-
-                GL.Enable(EnableCap.TextureCubeMap);
-                GL.BindTexture(TextureTarget.TextureCubeMap, skybox);
-
-                //gl.texImage2D(types[i], 0, GL_RGB, pImage->columns(), pImage->rows(), 0, RenderingContext.RGBA,
-                //     RenderingContext.UNSIGNED_BYTE, blob.data());
-                GL.TexImage2D(TextureTarget.TextureCubeMap, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
-
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
-                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (isPowerOf2 ? (int)TextureMinFilter.LinearMipmapNearest : (int)TextureMinFilter.Linear));
-
-                if (isPowerOf2) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-                
-                onloadComplete(skybox);
-            });
-        }
-    }
 }
