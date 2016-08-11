@@ -193,7 +193,12 @@ namespace Aletha.bsp
         // Read a float (4 bytes) from the stream
         public float readFloat()
         {
-            float f = BitConverter.ToSingle(data, (int)this.offset); // TODO: use 64bit addressing
+            float f;
+
+            //f = (float)BitConverter.ToInt32(data, (int)this.offset);
+            
+            f = BitConverter.ToSingle(data, (int)this.offset); // TODO: use 64bit addressing
+
             //var i = this.offset;
             //bf_wuba[0] = data.getUint8(i) & 0xff;
             //bf_wuba[1] = data.getUint8(i + 1) & 0xff;

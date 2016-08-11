@@ -198,39 +198,16 @@ namespace Aletha.bsp
 				}
 			}
 
-			// needs to be Float32List
-			// Compile vert list INTERLEAVE
-			//var vertices = new Array(verts.length*14);
-            float[] vertices = new float[verts.Count * 14];
-            
-            int offset = 0;
+            // needs to be Float32List
+            // Compile vert list INTERLEAVE
+            //var vertices = new Array(verts.length*14);
+            float[] vertices;
 
-			for(int i = 0; i < verts.Count; ++i) 
-			{
-				vert = verts[i];
+            vertices = interleave(verts);
 
-				vertices[offset++] = vert.pos.X;
-				vertices[offset++] = vert.pos.Y;
-				vertices[offset++] = vert.pos.Z;
 
-				vertices[offset++] = vert.texCoord.X;
-				vertices[offset++] = vert.texCoord.Y;
-
-				vertices[offset++] = vert.lmNewCoord.X;
-				vertices[offset++] = vert.lmNewCoord.Y;
-
-				vertices[offset++] = vert.normal.X;
-				vertices[offset++] = vert.normal.Y;
-				vertices[offset++] = vert.normal.Z;
-
-                vertices[offset++] = vert.color.X;
-                vertices[offset++] = vert.color.Y;
-                vertices[offset++] = vert.color.Z;
-                vertices[offset++] = vert.color.W;
-			}
-
-			// Compile index list
-			//Uint16List indices = new Uint16List(0);
+            // Compile index list
+            //Uint16List indices = new Uint16List(0);
             List<int> lst_indices = new List<int>();
 
 			for(int i = 0; i <  shaders.Count; ++i) 
@@ -271,6 +248,42 @@ namespace Aletha.bsp
 				surfaces = shaders
 
             });
+        }
+
+        private static float[] interleave(List<Vertex> verticies)
+        {
+            Vertex vert;
+            float[] vertices;
+            int offset;
+
+            vertices = new float[verticies.Count * 14]; ;
+            offset = 0;
+
+            for (int i = 0; i < verticies.Count; ++i)
+            {
+                vert = verticies[i];
+
+                vertices[offset++] = vert.pos.X;
+                vertices[offset++] = vert.pos.Y;
+                vertices[offset++] = vert.pos.Z;
+
+                vertices[offset++] = vert.texCoord.X;
+                vertices[offset++] = vert.texCoord.Y;
+
+                vertices[offset++] = vert.lmNewCoord.X;
+                vertices[offset++] = vert.lmNewCoord.Y;
+
+                vertices[offset++] = vert.normal.X;
+                vertices[offset++] = vert.normal.Y;
+                vertices[offset++] = vert.normal.Z;
+
+                vertices[offset++] = vert.color.X;
+                vertices[offset++] = vert.color.Y;
+                vertices[offset++] = vert.color.Z;
+                vertices[offset++] = vert.color.W;
+            }
+
+            return vertices;
         }
 	}
 }

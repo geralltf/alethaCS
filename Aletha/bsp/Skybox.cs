@@ -26,7 +26,7 @@ namespace Aletha
         static int skyboxIndexBuffer = -1;
         static int skyboxIndexCount = 0;
         static Matrix4 skyboxMat;
-        static shader_gl skyShader;
+        public static shader_gl skyShader;
         //static bool has_skyparams;
 
         public String skybox_env_url = Config.q3bsp_base_folder + "/env/" + Config.mapName + "/";
@@ -128,7 +128,7 @@ namespace Aletha
 
         public void bindSkyTexture(stage_gl stage, shader_prog_t program, float time)
         {
-            
+
             //map.render();
 
             //    if(type == skybox_type.one_tex)
@@ -217,6 +217,9 @@ namespace Aletha
 
                             shaderProgram = q3bsp.glshading.defaultProgram;
 
+
+                            GL.UseProgram(shaderProgram.program);
+
                             bindSkyTexture(null, shaderProgram, time);
 
                             skybox.bindSkyAttribs(shaderProgram);
@@ -225,7 +228,6 @@ namespace Aletha
 
                             q3bsp.setViewport(leftViewport);
 
-                            GL.UseProgram(shaderProgram.program);
 
                             GL.Disable(EnableCap.DepthTest);
 

@@ -69,9 +69,9 @@ namespace Aletha
                     //        onloadComplete(texture,image);
                     //      });
 
-                    try
-                    {
-
+                    //try
+                    //{
+                        url = url.Replace("/", "\\"); // they are all located in base folder on local file system not on web
 
                         image = new Bitmap(url);
 
@@ -81,11 +81,11 @@ namespace Aletha
                         onloadComplete(texture, image);
 
                         Console.WriteLine(url);
-                    }
-                    catch(Exception ex)
-                    {
-                        Console.WriteLine("[warning] could not find texture '{0}'", url);
-                    }
+                    //}
+                    //catch(Exception ex)
+                    //{
+                    //    Console.WriteLine("[warning] could not find texture '{0}'", url);
+                    //}
                 }
 
 

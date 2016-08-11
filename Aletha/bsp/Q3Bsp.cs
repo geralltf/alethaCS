@@ -351,7 +351,7 @@ namespace Aletha.bsp
                     // PROCESS SURFACE SHADERS
                     // as they come in until there are none left
 
-                    if (work_items.Count == 0)
+                    if (unshadedSurfaces.Count == 0)
                     { // Have we processed all surfaces?
                       // Sort to ensure correct order of transparent objects
 
@@ -375,6 +375,8 @@ namespace Aletha.bsp
                     else
                     {
                         surface = work_items.Pop();
+                        unshadedSurfaces.RemoveAt(0);
+
                         //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
 
                         String shader_name = surface.shaderName;
@@ -413,7 +415,7 @@ namespace Aletha.bsp
                             if (shader.sky == true)
                             {
 
-                                //skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
+                                skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
                             }
                             else
                             {
@@ -474,12 +476,12 @@ namespace Aletha.bsp
             }
         }
 
-        public static void draw(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport)
+        public static void draw(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
             if (vertexBuffer == -1 || indexBuffer == -1) { return; } // Not ready to draw yet
 
             // Seconds passed since map was initialized
-            float time = (DateTime.Now.Ticks - startTime) / 1000.0f;
+            //float time = (DateTime.Now.Ticks - startTime) / 1000.0f;
             //int i = 0;
 
             // Loop through all shaders, drawing all surfaces associated with them
@@ -489,15 +491,18 @@ namespace Aletha.bsp
 
 
                 // Model shader surfaces (can bind shader once and draw all of them very quickly)
-                if (modelSurfaces.Count > 0)
-                {
-                    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
-                }
+                //if (modelSurfaces.Count > 0)
+                //{
+                //    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+                //}
 
-                render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+
+                //BUG: at the moment with effect surfaces
+
+                //render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
             }
 
-            render_models(leftViewMat, leftProjMat, leftViewport, time);
+            //render_models(leftViewMat, leftProjMat, leftViewport, time);
         }
 
 
@@ -522,6 +527,8 @@ namespace Aletha.bsp
                 glshading.setShader(shader);
                 stage_gl stage = shader.stages[0];
                 shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
+
+
                 bsp_opengl_binders.bindShaderAttribs(shaderProgram);
 
                 GL.ActiveTexture(TextureUnit.Texture0);

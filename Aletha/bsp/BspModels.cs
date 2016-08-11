@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+using System.Runtime.InteropServices;
 
 namespace Aletha.bsp
 {
@@ -316,6 +317,8 @@ namespace Aletha.bsp
         public Vector2 lmNewCoord;
         public Vector3 normal;
         public Vector4 color;
+
+        public static readonly int Stride = Marshal.SizeOf(default(Vertex));
     }
 
     public struct vector2_int64_t

@@ -200,7 +200,7 @@ namespace Aletha.bsp
                     {
                         Match m2 = ma1[i];
 
-                        string g0 = m2.Groups[1].Value; //([1, 2]);
+                        //string g0 = m2.Groups[1].Value; //([1, 2]);
 
                         string entity_key = m2.Groups[1].Value;
                         string entity_value = m2.Groups[2].Value;
@@ -260,6 +260,12 @@ namespace Aletha.bsp
         
                     if (entity.targetname != null)
                     {
+                        //elements.Add(new Q3Entity()
+                        //{
+                        //    classname = "targets",
+                        //    targetname = entity.targetname;
+                        //});
+
                         //Dictionary<string, Entity> targets = (Dictionary<string, Entity>)elements["targets"];
                         //targets[entity.targetname] = entity;
                         //elements["targets"] = targets;
@@ -274,7 +280,7 @@ namespace Aletha.bsp
                         //elements.Add(new Q3Entity()
                         //{
                         //    Index = id,
-                            
+
                         //    entity = entity.entity,
                         //    name = entity.targetname
                         //});
