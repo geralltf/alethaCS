@@ -133,7 +133,7 @@ namespace X3D.Engine
 
             GL.Viewport(0, 0, Width, Height);
 
-            Projection = Matrix4.CreatePerspectiveFieldOfView(fovy, aspectRatio, zNear: 0.01f, zFar: 1000.0f);
+            Projection = Matrix4.CreatePerspectiveFieldOfView(fovy, aspectRatio, zNear: 0.01f, zFar: 10000.0f);
         }
 
         public void ApplyViewport(int viewportWidth, int viewportHeight)
@@ -144,7 +144,7 @@ namespace X3D.Engine
 
             GL.Viewport(0, 0, Width, Height);
 
-            Projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 0.01f, 1000.0f);
+            Projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 0.01f, 10000.0f);
 
 
             //Matrix4 projection;
