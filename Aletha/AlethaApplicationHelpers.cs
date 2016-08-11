@@ -97,7 +97,7 @@ namespace Aletha
                 ver = (AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(asm, typeof(AssemblyFileVersionAttribute));
                 desc = (AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(asm, typeof(AssemblyDescriptionAttribute));
 
-                return productName.Product + " " + ver.Version + " \"" + desc.Description + "\"";
+                return (productName.Product + " " + ver.Version + " " + desc.Description + "").Trim();
             }
         }
 
@@ -152,7 +152,7 @@ namespace Aletha
 
             // update world time a bit faster:
             WorldTime = DateTime.Now.Subtract(time_at_init);
-            this.Title = "Aletha Q3 C# Player " + title + " " + WorldTime.ToString() + "vwt";
+            this.Title = "Aletha Q3 C# Player " + title + " " + WorldTime.ToString() + "vwt " + progress_status;
         }
 
         private int GetFps(double time)

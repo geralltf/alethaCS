@@ -9,7 +9,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL4;
-using g = OpenTK.Graphics;
+using OpenTK.Graphics;
 using X3D.Engine;
 using Aletha.bsp;
 
@@ -19,12 +19,13 @@ namespace Aletha
     {
         public static int ResWidth = 800;
         public static int ResHeight = 600;
-        public static g.GraphicsMode GraphicsMode = new g.GraphicsMode(32, 16, 0, 4);
-        Matrix4 leftViewMat, rightViewMat;
-        Matrix4 leftProjMat, rightProjMat;
+        public static GraphicsMode GraphicsMode = new GraphicsMode(32, 16, 0, 4);
+        Matrix4 leftViewMat;
+        Matrix4 leftProjMat;
 
 		bool FULLSCREEN = false;
         bool GAME_INIT_MODE = false;
+        private string progress_status;
 
         int lastIndex;
         bool drawMap = true;
@@ -35,7 +36,7 @@ namespace Aletha
 
         public static int request_number = 0;
 
-        public TestCamera camera;
+        public SceneCamera camera;
         public static q3bsp map;
 
         public static INativeWindow NativeWindowContext { get; set; }
@@ -80,7 +81,8 @@ namespace Aletha
 			this.Keyboard.KeyUp += Keyboard_KeyUp;
             this.Keyboard.KeyDown += Keyboard_KeyDown;
 
-            camera = new TestCamera(ResWidth, ResHeight);
+            camera = new SceneCamera(ResWidth, ResHeight);
+
 
             NativeWindowContext = this;
             CurrentApplication = this;
@@ -130,18 +132,12 @@ namespace Aletha
 			GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);  // Really Nice Perspective Calculations
 
 			leftViewMat = Matrix4.Identity;
-			rightViewMat = Matrix4.Identity;
 			leftProjMat = Matrix4.Identity;
-			rightProjMat = Matrix4.Identity;
-
-            //leftViewport = Viewport.zero();
-            //rightViewport = Viewport.zero();
-
 
             startTime = DateTime.Now.Ticks;
             lastTimestamp = startTime;
-            //lastFps = (int)startTime;
 
+            leftProjMat = camera.Projection;
         }
 
 		private void initMap()
@@ -159,19 +155,14 @@ namespace Aletha
 
         private void OnMapLoaded (String map)
         {
-            //hide_progress_bar();
-            //hide_levelshot();
-            //hide_splash();
-
-            ////display_audio_graph();
-            //display_viewport_ui();
-            //display_crosshair_ui();
 
             Console.WriteLine("[loaded] bsp scene");
 
             respawnPlayer(0);
 
             OnResize(null);
+
+            //progress_status = "";
         }
 
         public static void incReqests()
@@ -182,8 +173,10 @@ namespace Aletha
         public static void update_progress_bar(int request_number, String url)
         {
             float progress = (request_number / (float)Config.map_tasks_count);
+            string status = string.Format("{0:n2}%", progress * 100);
 
-            Console.WriteLine("{0:n2}", progress * 100);
+            //Console.WriteLine(status);
+            CurrentApplication.progress_status = status;
 
             if (request_number == Config.map_tasks_count)
             {
@@ -206,7 +199,7 @@ namespace Aletha
 
             foreach (Q3Entity entity in entities)
             {
-                Console.WriteLine("[entity] {3}-{0} {1} {2} ", entity.classname, entity.targetname, entity.name, entity.Index);
+                Console.WriteLine("[~entity~] {3}-{0} {1} {2} ", entity.classname, entity.targetname, entity.name, entity.Index);
 
             }
         }
@@ -215,20 +208,20 @@ namespace Aletha
         // "Respawns" the player at a specific spawn point. Passing -1 will move the player to the next spawn point.
         private void respawnPlayer(int index) 
         {
-            if (q3bsp.entities != null && camera.playerMover != null)
+            if (q3bsp.entities != null && camera != null && camera.playerMover != null)
             {
                 String spawn_point_param_name;
                 List<Q3Entity> spawns;
                 
 
                 spawn_point_param_name = "info_player_deathmatch"; // Quake 3 bsp file
-                spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name).ToList();
+                spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name || e.classname == spawn_point_param_name).ToList();
 
                 if (!spawns.Any())
                 {
                     spawn_point_param_name = "info_player_start"; // TREMULOUS bsp file
 
-                    spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name).ToList();
+                    spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name || e.classname == spawn_point_param_name).ToList();
                 }
 
                 
@@ -239,7 +232,7 @@ namespace Aletha
                 }
                 lastIndex = index;
 
-                Q3Entity spawnPoint = spawns.First(e => e.Index == index);
+                Q3Entity spawnPoint = spawns[index]; //spawns.First(e => e.Index == index);
                 //Entity spawnPoint = q3bsp.entities[spawn_point_param_name];
 
                 float zAngle;
@@ -247,7 +240,7 @@ namespace Aletha
 
                 if (spawnPoint.Fields.ContainsKey("angle"))
                 {
-                    zAngle = (float)spawnPoint.Fields["angle"];
+                    zAngle = (float)((double)(spawnPoint.Fields["angle"]));
                 }
                 else
                 {
@@ -264,7 +257,7 @@ namespace Aletha
                 Vector3 origin = (Vector3)spawnPoint.Fields["origin"];
                 origin.Z += 30; // Start a little ways above the floor
 
-                camera.setOrigin(origin, rotation);
+                camera.SetOrigin(origin, rotation);
 
                 camera.velocity = Vector3.Zero;
 
@@ -276,6 +269,7 @@ namespace Aletha
         {
             _prev = DateTime.Now;
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.ClearColor(System.Drawing.Color.White);
 
             if (map == null || camera.playerMover == null)
             {
@@ -297,16 +291,7 @@ namespace Aletha
 
         protected override void OnResize(EventArgs e)
         {
-            float aspectRatio = this.Width / (float)this.Height;
-            float zNear = 1.0f;
-            float zFar = 4096.0f;
-            float fovYRadians = (float)Math.PI / 4.0f;
-
-            GL.Viewport(0, 0, Width, Height);
-
-            leftProjMat = Matrix4.CreatePerspectiveFieldOfView(fovYRadians, aspectRatio, zNear, zFar);
-            //leftProjMat = makePerspectiveMatrix(fovYRadians, aspectRatio, zNear, zFar);
-            //mat4.perspective(45.0, canvas.width/canvas.height, 1.0, 4096.0, leftProjMat);
+            camera.ApplyViewport(this.Width, this.Height);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -315,36 +300,9 @@ namespace Aletha
         }
 
 
-        public Matrix4 getViewMatrix(bool translated, Vector3? vrPosition, Vector4? vrOrientation, Vector3? eyeOffset, Matrix4 projection)
+        public Matrix4 getViewMatrix()
         {
-            Matrix4 result = Matrix4.Identity;
-
-            //if (vrPosition.HasValue)
-            //{
-            //    //Quaternion orientationQuaternion = getQuaternionXYZW(-vrOrientation.Value.X, -vrOrientation.Value.Y, -vrOrientation.Value.Z, vrOrientation.Value.W);
-            //    //hmdOrientationMatrix = mat4FromQuat(orientationQuaternion);
-            //    //quat4.toMat4([-vrPosition.orientation.x, -vrPosition.orientation.y, -vrPosition.orientation.z, vrPosition.orientation.w], hmdOrientationMatrix);
-
-            //    if (eyeOffset != null)
-            //    {
-            //        result = result.translate(-eyeOffset.Value.X * Config.vrIPDScale, -eyeOffset.Value.Y * vrIPDScale, -eyeOffset.Value.Z * vrIPDScale);
-            //        //mat4.translate(out, [-eyeOffset[0]*vrIPDScale, -eyeOffset[1]*vrIPDScale, -eyeOffset[2]*vrIPDScale]);
-            //    }
-
-            //    result = result.multiply(hmdOrientationMatrix);
-            //    //mat4.multiply(out, hmdOrientationMatrix, out);
-
-            //    if (translated && vrPosition['position'])
-            //    {
-            //        result = result.translate(-vrPosition.position.x * vrIPDScale, -vrPosition.position.y * vrIPDScale, -vrPosition.position.z * vrIPDScale);
-            //        //mat4.translate(out, [-vrPosition.position.x*vrIPDScale, -vrPosition.position.y*vrIPDScale, -vrPosition.position.z*vrIPDScale]);
-            //    }
-
-            //    return result;
-            //}
-
             camera.ApplyTransformations();
-            result = result * camera.Matrix;
 
             if (camera.HasChanges)
             {
@@ -353,7 +311,13 @@ namespace Aletha
 
             //display_player_position(camera.Position);
 
-            return result;
+
+            //Matrix4 cameraTransl = Matrix4.CreateTranslation(camera.Position);
+            //Matrix4 cameraRot = Matrix4.CreateFromQuaternion(camera.Orientation);
+            //Matrix4 MVP = cameraTransl * cameraRot; 
+
+            return camera.ViewMatrix;
+            //return MVP;
         }
 
         private void drawFrame(float frameTime)
@@ -367,9 +331,8 @@ namespace Aletha
 
             if (map == null || camera.playerMover == null) { return; }
 
-            bool translated = true;
             // Matrix setup
-            leftViewMat = getViewMatrix(translated, null, null, null, leftProjMat);
+            leftViewMat = getViewMatrix();
 
             leftViewport = new Viewport();
             leftViewport.width = (double)this.Width;
@@ -386,7 +349,7 @@ namespace Aletha
                     q3bsp.skybox_env.render(frameTime, leftViewport, leftViewMat, leftProjMat);
                 }
 
-                q3bsp.draw(leftViewMat, leftProjMat, leftViewport);
+                q3bsp.draw(leftViewMat, leftProjMat, leftViewport, frameTime);
             }
 
             //player.RenderPlayerModels(gl, leftViewMat, leftProjMat, leftViewport);
@@ -394,63 +357,17 @@ namespace Aletha
 
         private void moveLookLocked(int xDelta, int yDelta)
         {
-
-
             xAngle = xDelta * 0.0025f;
             yAngle = yDelta * 0.0025f;
 
-            //xAngle = MathHelper.ClampCircular(xAngle, 0.0, TwoPi);
-            //yAngle = MathHelper.ClampCircular(yAngle, 0.0, TwoPi);
-
-            //xAngle = MathHelper.ClampCircular(xAngle, 0.0, TwoPi);
-            //yAngle = MathHelper.ClampCircular(yAngle, 0.0, HalfPi);
-
-            //    while (xAngle < 0)
-            //      xAngle += TwoPi;
-            //    while (xAngle >= TwoPi)
-            //      xAngle -= TwoPi;
-            //
-            //    while (yAngle < -HalfPi)
-            //      yAngle = -HalfPi;
-            //    while (yAngle > HalfPi)
-            //      yAngle = HalfPi;
 
             camera.ApplyYaw(xAngle);
             camera.ApplyPitch(yAngle);
 
             camera.ApplyRotation();
-        }
 
-        private float filterDeadzone(float value)
-        {
-            return Math.Abs(value) > 0.35f ? value : 0;
-        }
-
-        private void moveViewOriented(Vector3 direction, int frameTime)
-        {
-            //  if(direction[0] != 0 || direction[1] != 0 || direction[2] != 0) 
-            //  {      
-            //      cameraMat = new Matrix4.identity();
-            //      
-            //      if (vrEnabled == true) 
-            //      {
-            //        vrEuler = eulerFromQuaternion(vrPosition['orientation'], VrPositionCoordinateOrder.YXZ);
-            //
-            //        cameraMat = cameraMat.rotateZ(camera.zAngle - vrEuler[1]);
-            //      } 
-            //      else 
-            //      {
-            //        cameraMat = cameraMat.rotateZ(camera.zAngle);
-            //      }
-            //      
-            //      cameraMat = mat4_inverse(cameraMat);
-            //      cameraMat = mat4MultiplyVec3(cameraMat, direction);
-            //  }
-
-            // Send desired movement direction to the player mover for collision detection against the map
-            camera.playerMover.move(direction, frameTime);
-
-
+            //  // Send desired movement direction to the player mover for collision detection against the map
+            //camera.playerMover.move(direction, frameTime);
         }
 
         private void updateInput(float frameTime)
@@ -501,12 +418,12 @@ namespace Aletha
             }
             if (Keyboard[Key.Up])
             {
-                camera.ApplyPitch(-0.1f); // yaw
+                camera.ApplyPitch(-0.1f);
                 rotated = true;
             }
             if (Keyboard[Key.Down])
             {
-                camera.ApplyPitch(0.1f); // yaw
+                camera.ApplyPitch(0.1f); 
                 rotated = true;
             }
 

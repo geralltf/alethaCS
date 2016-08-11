@@ -86,9 +86,12 @@ namespace Aletha
 		//
 
 		public const String q3bsp_default_vertex = @"
-		#ifdef GL_ES 
-		precision highp float;
-		#endif 
+//#version 420 core
+//layout(location = 0) in vec3 position;
+//layout(location = 1) in vec3 normal;
+//layout(location = 2) in vec4 color;
+//layout(location = 3) in vec2 texCoord;
+//layout(location = 4) in vec2 lightCoord;
 
 		attribute vec3 position; 
 		attribute vec3 normal; 
@@ -103,41 +106,43 @@ namespace Aletha
 		uniform mat4 modelViewMat; 
 		uniform mat4 projectionMat; 
 
-		void main(void) { 
-		  vec4 worldPosition = modelViewMat * vec4(position, 1.0); 
-		  vTexCoord = texCoord; 
-		  vColor = color; 
-		  vLightmapCoord = lightCoord; 
-		  gl_Position = projectionMat * worldPosition; 
+		void main(void) 
+        { 
+            mat4 model = projectionMat * modelViewMat;
+		    vec4 worldPosition = vec4(position, 1.0); 
+
+		    vTexCoord = texCoord; 
+		    vColor = color; 
+		    vLightmapCoord = lightCoord; 
+
+            gl_Position = model * worldPosition; 
 		}";
 
 		public const String q3bsp_default_fragment = @"
-		#ifdef GL_ES 
-		precision highp float; 
-		#endif 
 
 		varying vec2 vTexCoord; 
 		varying vec2 vLightmapCoord; 
 		uniform sampler2D texture;
 		uniform sampler2D lightmap;
 
-		void main(void) { 
+		void main(void) 
+        { 
 		        vec4 diffuseColor = texture2D(texture, vTexCoord); 
 		        vec4 lightColor = texture2D(lightmap, vLightmapCoord); 
+
 		        gl_FragColor = vec4(diffuseColor.rgb * lightColor.rgb, diffuseColor.a); 
 		}";
 
 		public const String q3bsp_model_fragment = @"
-		#ifdef GL_ES 
-		precision highp float; 
-		#endif 
 
 		varying vec2 vTexCoord; 
 		varying vec4 vColor; 
 		uniform sampler2D texture; 
 
-		void main(void) { 
-		    vec4 diffuseColor = texture2D(texture, vTexCoord); 
+		void main(void) 
+        { 
+		    vec4 diffuseColor = texture2D(texture, vTexCoord);
+ 
 		    gl_FragColor = vec4(diffuseColor.rgb * vColor.rgb, diffuseColor.a);
 		}";
 
