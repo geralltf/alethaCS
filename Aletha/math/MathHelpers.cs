@@ -305,7 +305,7 @@ namespace X3D
                     }
                     else
                     {
-                        saturation = min / 255;
+                        saturation = min / 255f;
                     }
                 }
                 else

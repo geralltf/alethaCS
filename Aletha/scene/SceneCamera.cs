@@ -69,7 +69,7 @@ namespace X3D.Engine
         /// </summary>
         public Vector3 calibTrans = Vector3.Zero;
         public Vector3 calibOrient = Vector3.Zero;
-        public Vector3 calibSpeed = new Vector3(0.01f, 0.01f, 0.01f);
+        public Vector3 calibSpeed = new Vector3(0.00001f, 0.00001f, 0.00001f);
 
         public SceneCamera(int viewportWidth, int viewportHeight)
         {

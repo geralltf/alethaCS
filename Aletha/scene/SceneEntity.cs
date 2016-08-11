@@ -44,9 +44,11 @@ namespace X3D.Engine
 
             outm = outm * Matrix4.CreateTranslation(Position);
 
-			ModelView *= Matrix4.Scale(new Vector3(1.0f, 1.0f, -1.0f)); // ModelView = ModelView.Scale(1.0, 1.0, -1.0);
+#pragma warning disable
+            ModelView *= Matrix4.Scale(new Vector3(1.0f, 1.0f, -1.0f)); // ModelView = ModelView.Scale(1.0, 1.0, -1.0);
+#pragma warning restore
 
-			this.Matrix = outm;
+            this.Matrix = outm;
 		}
 
 		public void ApplyOrientation(float pitch, float yaw)

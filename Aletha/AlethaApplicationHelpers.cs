@@ -12,6 +12,8 @@ namespace Aletha
 {
     public partial class AlethaApplication
     {
+        bool isFullscreen;
+
         private void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
         {
             if (e.Key == Key.C)
@@ -44,7 +46,10 @@ namespace Aletha
 				{
 					WindowState = WindowState.Fullscreen;
 				}
-			}
+
+                isFullscreen = !isFullscreen;
+
+            }
             if (e.Key == Key.C)
             {
                 camera.playerMover.crouchUp();

@@ -20,8 +20,8 @@ namespace Aletha
 
 		// Constants
 		public static int q3bsp_vertex_stride = 56;
-		public static int q3bsp_sky_vertex_stride = 20;
-		public static String q3bsp_base_folder = "base";
+		public static int q3bsp_sky_vertex_stride = (3+2) * sizeof(float); // sizeof(float) * 2 * 3;
+        public static String q3bsp_base_folder = "base";
 		public static String q3bsp_no_shader_default_texture_url = q3bsp_base_folder + "/webgl/no-shader.png";
 		public static String q3bsp_no_shader_default_texture_url2 = q3bsp_base_folder + "/webgl/no-tex.png";
 
@@ -131,6 +131,8 @@ namespace Aletha
 		        vec4 lightColor = texture2D(lightmap, vLightmapCoord); 
 
 		        gl_FragColor = vec4(diffuseColor.rgb * lightColor.rgb, diffuseColor.a); 
+
+                //gl_FragColor = vec4(0,1,1,1) + diffuseColor / 2.0;
 		}";
 
 		public const String q3bsp_model_fragment = @"
@@ -144,6 +146,8 @@ namespace Aletha
 		    vec4 diffuseColor = texture2D(texture, vTexCoord);
  
 		    gl_FragColor = vec4(diffuseColor.rgb * vColor.rgb, diffuseColor.a);
+
+            //gl_FragColor = vec4(0,1,1,1) + diffuseColor / 2.0;
 		}";
 
 	}

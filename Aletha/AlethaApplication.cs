@@ -33,10 +33,13 @@ namespace Aletha
 
         long startTime;
         long lastTimestamp;
+        Vector2 mouseDelta;
+
+        bool? lockMouseCursor;
 
         public static int request_number = 0;
 
-        public SceneCamera camera;
+        public static SceneCamera camera;
         public static q3bsp map;
 
         public static INativeWindow NativeWindowContext { get; set; }
@@ -87,8 +90,7 @@ namespace Aletha
             NativeWindowContext = this;
             CurrentApplication = this;
         }
-
-
+     
 
         protected override void OnLoad(EventArgs e)
         {
@@ -153,7 +155,7 @@ namespace Aletha
             BspCompiler.load(Config.map_uri, tess_level, null);
         }
 
-        private void OnMapLoaded (String map)
+        private void OnMapLoaded (string map)
         {
 
             Console.WriteLine("[loaded] bsp scene");
@@ -196,10 +198,22 @@ namespace Aletha
 		private void bsp_entities_initilised(List<Q3Entity> entities)
         {
             // Process entities loaded from the map  
+            string msg;
+            string fields;
 
             foreach (Q3Entity entity in entities)
             {
-                Console.WriteLine("[~entity~] {3}-{0} {1} {2} ", entity.classname, entity.targetname, entity.name, entity.Index);
+
+
+                msg = string.Format("[~entity~] {3}-{0} {1} {2} ", entity.classname, entity.targetname, entity.name, entity.Index);
+                fields = "";
+
+                foreach (var field in entity.Fields)
+                {
+                    fields += " [" + field.Key + "=" + field.Value +"]";
+                }
+
+                Console.WriteLine(msg + " fields=" + fields.Trim());
 
             }
         }
@@ -277,14 +291,13 @@ namespace Aletha
             }
 
             
-            updateInput((float)e.Time);
-
             drawFrame((float)e.Time);
 
             if (e != null)
             {
                 UpdateTitle(e);
             }
+
             SwapBuffers();
         }
 
@@ -296,9 +309,76 @@ namespace Aletha
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            updateInput((float)e.Time);
+
+            if (isFullscreen)
+            {
+                mouseDelta = new Vector2
+                (
+                   System.Windows.Forms.Cursor.Position.X - (this.Bounds.Width / 2.0f),
+                   System.Windows.Forms.Cursor.Position.Y - (this.Bounds.Height / 2.0f)
+                );
+
+                mouseDelta *= 0.0005f;
+                mouseDelta.Y += 0.009999956f; // mouse not in exact center
+
+                updateCamera();
+
+                LockMouseCursor();
+            }
 
         }
+        private void updateCamera()
+        {
+            Vector3 direction = Vector3.Zero;
 
+            //if (Math.Abs(mouseDelta.X) > Math.Abs(mouseDelta.Y))
+            //    direction.X = (dx > 0) ? 0.1f : -0.1f;
+            //else
+            //    direction.Y = (dy > 0) ? 0.1f : -0.1f;
+
+
+
+            direction = new Vector3(mouseDelta);
+
+            float xAngle = (direction.X);
+            float yAngle = (direction.Y);
+
+
+            camera.ApplyYaw(xAngle);
+            camera.ApplyPitch(yAngle);
+            camera.ApplyRotation();
+        }
+
+        private void LockMouseCursor()
+        {
+            if (lockMouseCursor.HasValue == false)
+            {
+                var result = System.Windows.Forms.MessageBox.Show(
+                    "Do you want to allow this application to lock the mouse cursor?\n (Note if you allow the lock, you can quit the application by pressing 'q')",
+                    "Lock Mouse Cursor",
+                    System.Windows.Forms.MessageBoxButtons.YesNo);
+
+                lockMouseCursor = (result == System.Windows.Forms.DialogResult.Yes);
+            }
+
+            if (lockMouseCursor.HasValue && lockMouseCursor.Value == true)
+            {
+                //        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(window.Bounds.Left + (window.Bounds.Width / 2),
+                //window.Bounds.Top + (window.Bounds.Height / 2));
+
+
+
+                if (this.isFullscreen)
+                {
+                    System.Drawing.Rectangle screen = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea;
+
+                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(screen.Width / 2,
+                        screen.Height / 2);
+                }
+
+            }
+        }
 
         public Matrix4 getViewMatrix()
         {
@@ -326,7 +406,12 @@ namespace Aletha
 
             // Clear back buffer but not color buffer (we expect the entire scene to be overwritten)
             GL.DepthMask(true);
-            GL.Clear(ClearBufferMask.DepthBufferBit);
+            
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthMask(true);
+            GL.DepthFunc(DepthFunction.Lequal);
+
             //gl.clearColor(0.0, 0.0, 0.0,1.0);
 
             if (map == null || camera.playerMover == null) { return; }
@@ -353,21 +438,6 @@ namespace Aletha
             }
 
             //player.RenderPlayerModels(gl, leftViewMat, leftProjMat, leftViewport);
-        }
-
-        private void moveLookLocked(int xDelta, int yDelta)
-        {
-            xAngle = xDelta * 0.0025f;
-            yAngle = yDelta * 0.0025f;
-
-
-            camera.ApplyYaw(xAngle);
-            camera.ApplyPitch(yAngle);
-
-            camera.ApplyRotation();
-
-            //  // Send desired movement direction to the player mover for collision detection against the map
-            //camera.playerMover.move(direction, frameTime);
         }
 
         private void updateInput(float frameTime)
@@ -426,6 +496,60 @@ namespace Aletha
                 camera.ApplyPitch(0.1f); 
                 rotated = true;
             }
+
+            // Calibrator (for translation debugging)
+            if (Keyboard[Key.Number1])
+            {
+                camera.calibTrans.X += camera.calibSpeed.X;
+            }
+            if (Keyboard[Key.Number2])
+            {
+                camera.calibTrans.X -= camera.calibSpeed.X;
+            }
+            if (Keyboard[Key.Number3])
+            {
+                camera.calibTrans.Y += camera.calibSpeed.Y;
+            }
+            if (Keyboard[Key.Number4])
+            {
+                camera.calibTrans.Y -= camera.calibSpeed.Y;
+            }
+            if (Keyboard[Key.Number5])
+            {
+                camera.calibTrans.Z += camera.calibSpeed.Z;
+            }
+            if (Keyboard[Key.Number6])
+            {
+                camera.calibTrans.Z -= camera.calibSpeed.Z;
+            }
+
+            // Calibrator (for orientation debugging)
+            if (Keyboard[Key.Number6])
+            {
+                camera.calibOrient.X += camera.calibSpeed.X;
+            }
+            if (Keyboard[Key.Number7])
+            {
+                camera.calibOrient.X -= camera.calibSpeed.X;
+            }
+            if (Keyboard[Key.Number8])
+            {
+                camera.calibOrient.Y += camera.calibSpeed.Y;
+            }
+            if (Keyboard[Key.Number9])
+            {
+                camera.calibOrient.Y -= camera.calibSpeed.Y;
+            }
+            if (Keyboard[Key.Minus])
+            {
+                camera.calibOrient.Z += camera.calibSpeed.Z;
+            }
+            if (Keyboard[Key.Plus])
+            {
+                camera.calibOrient.Z -= camera.calibSpeed.Z;
+            }
+
+
 
             if (rotated)
             {

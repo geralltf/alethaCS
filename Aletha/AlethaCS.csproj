@@ -19,6 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -35,9 +36,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bsp\BspBinaryStream.cs" />
+    <Compile Include="bsp\ArrayBuffer.cs" />
+    <Compile Include="bsp\BinaryStreamReader.cs" />
     <Compile Include="bsp\BspHelpers.cs" />
     <Compile Include="bsp\BspModels.cs" />
     <Compile Include="bsp\BspParser.cs" />
@@ -62,6 +65,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Aletha.cs" />
     <Compile Include="scene\Camera.cs" />
+    <Compile Include="scene\cubemap.cs" />
+    <Compile Include="scene\cubemap_texture_one.cs" />
+    <Compile Include="scene\cubemap_texture_six.cs" />
     <Compile Include="scene\SceneCamera.cs" />
     <Compile Include="scene\SceneEntity.cs" />
     <Compile Include="math\MatrixExtensions.cs" />
