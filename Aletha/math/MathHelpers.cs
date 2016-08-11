@@ -1,0 +1,448 @@
+﻿using OpenTK;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace X3D
+{
+    public class MathHelpers
+    {
+        public const float PI = (float)Math.PI; // 180 degrees
+        public const float PIOver2 = PI / 2.0f; // 90 degrees
+        public const float PIOver4 = PI / 4.0f; // 45 degrees
+        public const float ThreePIOver2 = (3.0f * PI) / 2.0f; // 270 degrees
+        public const float PI_OVER_180 = (float)Math.PI / 180.0f; // radian ratio (used to convert radians to degrees)
+        public const float Zenith = (float)Math.PI / 2.0f;
+        public const float PI2 = 2.0f * (float)Math.PI;
+        public const float PiOver180 = PI_OVER_180;
+        public const float TwoPi = PI2;
+        public const float EPS = 0.000001f;
+
+        public static float INFINITY = float.PositiveInfinity; // 1.0 / 0.0;
+        public static float NAN = float.NaN;
+        public static float NEGATIVE_INFINITY = -INFINITY;
+        public static float MIN_POSITIVE = (float)5e-324;
+        public static float MAX_FINITE = (float)1.7976931348623157e+308;
+        public static float Pi = (float)3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844609550582231725359408128481117450284102701938521105559644622948954930382;
+        public static float PiOver2 = Pi / 2.0f;
+        public static float PiOver3 = Pi / 3.0f;
+        public static float PiOver4 = Pi / 4.0f;
+        public static float PiOver6 = Pi / 4.0f;
+        public static float HalfPi = 0.5f * Pi;
+        public static float ThreePiOver2 = 3 * Pi / 2;
+        public static float E = 2.71828182845904523536f;
+        public static float Log10E = 0.434294482f;
+        public static float Log2E = 1.442695041f;
+
+        public static Vector3 UnitX = new Vector3(1.0f, 0.0f, 0.0f); // Defines a unit-length Vector3 that points towards the X-axis.
+        public static Vector3 UnitY = new Vector3(0.0f, 1.0f, 0.0f); // Defines a unit-length Vector3 that points towards the Y-axis
+        public static Vector3 UnitZ = new Vector3(0.0f, 0.0f, 1.0f); // Defines a unit-length Vector3 that points towards the Z-axis.
+        public static Vector3 Zero = new Vector3(0.0f, 0.0f, 0.0f); // Defines a zero-length Vector3.
+        public static Vector3 One = new Vector3(1.0f, 1.0f, 1.0f); // Defines a vector with a magnitude of Ones
+
+        public static Vector4 V4UnitX = new Vector4(1.0f, 0.0f, 0.0f, 0.0f); // Defines a unit-length Vector4 that points towards the X-axis.
+        public static Vector4 V4UnitY = new Vector4(0.0f, 1.0f, 0.0f, 0.0f); // Defines a unit-length Vector4 that points towards the Y-axis.
+        public static Vector4 V4UnitZ = new Vector4(0.0f, 0.0f, 1.0f, 0.0f); // Defines a unit-length Vector4 that points towards the Z-axis.
+        public static Vector4 V4UnitW = new Vector4(0.0f, 0.0f, 0.0f, 1.0f); // Defines a unit-length Vector4 that points towards the W-axis.
+
+        #region Clamping
+
+        public static double Clamp(double value, double min, double max)
+        {
+            return value > max ? max : (value < min ? min : value);
+        }
+
+        public static double ClampCircular(double n, double min, double max)
+        {
+            if (n >= max) n -= max;
+            if (n < min) n += max;
+            return n;
+        }
+
+        public static float Clamp(float value, float min, float max)
+        {
+            return value > max ? max : (value < min ? min : value);
+        }
+
+        public static float ClampCircular(float n, float min, float max)
+        {
+            if (n >= max) n -= max;
+            if (n < min) n += max;
+            return n;
+        }
+
+        #endregion
+
+        public static double FractionalPart(double n)
+        {
+            double fraction;
+
+            fraction = n - Math.Floor(n);
+
+            return fraction;
+        }
+
+        public static double RoundFractional(double n, double interval)
+        {
+            return Math.Round(n * interval, 0) / interval;
+        }
+
+        /// <summary>
+        /// Build a rotation matrix from the specified quaternion.
+        /// </summary>
+        /// <param name="q">Quaternion to translate.</param>
+        /// <returns>A matrix instance.</returns>
+        public static Matrix4 CreateRotation(ref Quaternion q)
+        {
+            Matrix4 result = Matrix4.Identity;
+
+			float X = q.X;
+			float Y = q.Y;
+			float Z = q.Z;
+			float W = q.W;
+			
+			float xx = X * X;
+			float xy = X * Y;
+			float xz = X * Z;
+			float xw = X * W;
+			float yy = Y * Y;
+			float yz = Y * Z;
+			float yw = Y * W;
+			float zz = Z * Z;
+			float zw = Z * W;
+			
+			result.M11 = 1 - 2 * (yy + zz);
+			result.M21 = 2 * (xy - zw);
+			result.M31 = 2 * (xz + yw);
+			result.M12 = 2 * (xy + zw);
+			result.M22 = 1 - 2 * (xx + zz);
+			result.M32 = 2 * (yz - xw);
+			result.M13 = 2 * (xz - yw);
+			result.M23 = 2 * (yz + xw);
+			result.M33 = 1 - 2 * (xx + yy);
+           return result;
+        }
+
+        /// <summary>
+        /// Return next highest power of two.
+        /// Useful for computing valid OpenGL texture sizes.
+        /// </summary>
+        public static int ComputeNextHighestPowerOfTwo(int n)
+        {
+            int result;
+            int i;
+
+            --n;
+
+            for (i = 1; i < 32; i <<= 1)
+            {
+                n = n | n >> i;
+            }
+
+            result = n + 1;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Calculates the Maximum component within the vector.
+        /// </summary>
+        public static float Max(Vector3 vector)
+        {
+            float result;
+
+            result = Math.Max(vector.X, Math.Max(vector.Y, vector.Z));
+
+            return result;
+        }
+
+        /// <summary>
+        /// Calculates the Minimum component within the vector.
+        /// </summary>
+        public static float Min(Vector3 vector)
+        {
+            float result;
+
+            result = Math.Min(vector.X, Math.Min(vector.Y, vector.Z));
+
+            return result;
+        }
+
+        /// <summary>
+        /// Calculates the Maximum Vector
+        /// </summary>
+        public static Vector3 Max(Vector3 vector1, Vector3 vector2)
+        {
+            Vector3 result;
+
+            result = new Vector3()
+            {
+                X = Math.Max(vector1.X, vector2.X),
+                Y = Math.Max(vector1.Y, vector2.Y),
+                Z = Math.Max(vector1.Z, vector2.Z)
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Calculates the Minimum Vector
+        /// </summary>
+        public static Vector3 Min(Vector3 vector1, Vector3 vector2)
+        {
+            Vector3 result;
+
+            result = new Vector3()
+            {
+                X = Math.Min(vector1.X, vector2.X),
+                Y = Math.Min(vector1.Y, vector2.Y),
+                Z = Math.Min(vector1.Z, vector2.Z)
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Calculates the absolute value of each component in the specified vector
+        /// </summary>
+        public static Vector3 Abs(Vector3 vector)
+        {
+            Vector3 result;
+
+            result = new Vector3()
+            {
+                X = Math.Abs(vector.X),
+                Y = Math.Abs(vector.Y),
+                Z = Math.Abs(vector.Z)
+            };
+
+            return result;
+        }
+
+        public static Vector2 uv(float u, float v)
+        {
+            return new Vector2(u, v);
+        }
+        public static Vector2 uv(Vector3 xyz, float radius, float sectorIndex)
+        {
+            return Vector2.Zero;
+        }
+        public static Vector2 uv(Vector3 xyz, float radius)
+        {
+            float u, v;
+
+
+
+            var radian = radius * (Math.PI / 180.0f);
+
+            var xcos = (float)Math.Cos(radian);
+            var ysin = (float)Math.Sin(radian);
+
+            //x = xcos * c.r + c.pos.x;
+            //y = ysin * c.r + c.pos.y;
+
+            u = xcos * 0.5f + 0.5f;
+            v = ysin * 0.5f + 0.5f;
+
+
+            return new Vector2(u, v);
+        }
+
+        /// <summary>
+        /// Computes the facet Texture Coordinate for a Sphere given the Sphere's facet normal.
+        /// </summary>
+        [Obsolete("Perform this calculation in a Vertex or Geometry shader for increased performance.")]
+        public static Vector2 uv(Vector3 facetNormal)
+        {
+            return new Vector2((float)(Math.Asin(facetNormal.X) / Math.PI + 0.5),
+                (float)(Math.Asin(facetNormal.Y) / Math.PI + 0.5));
+        }
+
+        public static Vector3 ToHSV(Vector3 color)
+        {
+            Vector3 result; // the resultant color converted to HSV space
+            float hue;              // degrees [0, 360]
+            float saturation;       // [0, 1]
+            float value;            // [0, 1]
+            float min,
+                  max,
+                  delta;
+            Vector3 c;
+
+            c = color * 255;
+
+            System.Drawing.Color _color = System.Drawing.Color.FromArgb(255, (int)c.X, (int)c.Y, (int)c.Z);
+            hue = _color.GetHue();
+            saturation = _color.GetSaturation();
+            value = _color.GetBrightness() * 255;
+            return new Vector3(hue, saturation, value);
+
+
+
+            //if (c.X == 255 && c.Y == 255 && c.Z == 255)
+            //{
+            //    hue = 0;
+            //    saturation = 0;
+            //    value = 100;
+
+            //    return new Vector3(hue, saturation, value);
+            //}
+
+            min = Min(c);
+            max = Max(c);
+
+            value = max;
+            delta = max - min;
+
+            if (max != 0)
+            {
+                if(delta == 0)
+                {
+                    if(min == 255)
+                    {
+                        saturation = 0;
+                    }
+                    else
+                    {
+                        saturation = min / 255;
+                    }
+                }
+                else
+                {
+                    saturation = delta / max;
+                }
+            }
+            else
+            {
+                saturation = 0;
+                hue = 0;
+                value = 0;
+
+                return new Vector3(hue, saturation, value);
+            }
+
+            if (c.X == max) // red is dominant
+                hue = (c.Y - c.Z) / delta;       // between yellow & magenta
+            else if (c.Y == max) // green is dominant
+                hue = 2 + (c.Z - c.X) / delta;   // between cyan & yellow
+            else // blue is dominant
+                hue = 4 + (c.X - c.Y) / delta;   // between magenta & cyan
+
+            hue *= 60;
+
+            if (hue < 0)
+                hue += 360;
+
+            if (float.IsNaN(hue))
+            {
+                hue = 0;
+            }
+
+            result = new Vector3(hue, saturation, value);
+
+            return result;
+        }
+
+        public static Vector3 FromHSV(Vector3 hsv)
+        {
+            Vector3 result; // the resultant HSV value converted to RGB space
+            float hue;
+            float saturation;
+            float value;
+            int i;
+            float f;
+            float v;
+            float p;
+            float q;
+            float t;
+
+            hue = hsv.X;
+            saturation = hsv.Y;
+            value = hsv.Z;
+
+            i = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            f = hue / 60f - (float)Math.Floor(hue / 60f);
+
+            v = value;
+            p = (value * (1 - saturation));
+            q = (value * (1 - f * saturation));
+            t = (value * (1 - (1 - f) * saturation));
+
+            switch (i)
+            {
+                default:
+                    result = new Vector3(v, p, q);
+                    break;
+                case 0:
+                    result = new Vector3(v, t, p);
+                    break;
+                case 1:
+                    result = new Vector3(q, v, p);
+                    break;
+                case 2:
+                    result = new Vector3(p, v, t);
+                    break;
+                case 3:
+                    result = new Vector3(p, q, v);
+                    break;
+                case 4:
+                    result = new Vector3(t, p, v);
+                    break;
+            }
+
+            result /= 255.0f;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Computes spherical linear interpolaton between two points 'from' 'to'
+        /// </summary>
+        public static Vector3 Slerp(Vector3 from, Vector3 to, float ratio)
+        {
+            Vector3 average;
+            float slerpRange;
+            float slerpRangePhi;
+
+            
+            slerpRange = Vector3.Dot(from.Normalized(), to.Normalized());
+
+            slerpRangePhi = (float)Math.Acos(slerpRange * PI / 180.0);
+
+            average = (from * (float)Math.Sin((1 - ratio) * slerpRangePhi)
+                + (to * (float)Math.Sin(ratio * slerpRangePhi)) / (float)Math.Sin(slerpRangePhi));
+
+            return average;
+        }
+
+        /// <summary>
+        /// Computes linear interpolation between two points 'from' 'to'
+        /// and returns the resultant interpolated value that lies within the specified range.
+        /// </summary>
+        public static Vector3 Lerp(Vector3 from, Vector3 to, float ratio)
+        {
+            //return (from * (1.0f - ratio)) + (to * ratio);
+            return (from + (to - from) * ratio);
+        }
+
+        public static Vector3 Perp(Vector3 v)
+        {
+            float min = Math.Abs(v.X);
+            Vector3 cardinalAxis = Vector3.UnitX;
+
+            if (Math.Abs(v.Y) < min)
+            {
+                min = Math.Abs(v.Y);
+                cardinalAxis = Vector3.UnitY;
+            }
+
+            if (Math.Abs(v.Z) < min)
+            {
+                cardinalAxis = Vector3.UnitZ;
+            }
+
+            return Vector3.Cross(v, cardinalAxis);
+        }
+    }
+}
