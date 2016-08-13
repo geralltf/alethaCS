@@ -433,28 +433,28 @@ namespace Aletha
                 Quit();
             }
 
-            //if (Keyboard[Key.W])
-            //{
-            //    direction += camera.Direction * Config.playerDirectionMagnitude;
-            //    translated = true;
-            //}
-            //if (Keyboard[Key.S])
-            //{
-            //    direction -= camera.Direction * Config.playerDirectionMagnitude;
-            //    translated = true;
-            //}
-            //if (Keyboard[Key.A])
-            //{
-            //    camera.Right = camera.Up.Cross(camera.Direction);
-            //    direction += camera.Right * Config.playerDirectionMagnitude;
-            //    translated = true;
-            //}
-            //if (Keyboard[Key.D])
-            //{
-            //    camera.Right = camera.Up.Cross(camera.Direction);
-            //    direction -= camera.Right * Config.playerDirectionMagnitude;
-            //    translated = true;
-            //}
+            if (Keyboard[Key.W])
+            {
+                direction += camera.Direction * Config.playerDirectionMagnitude;
+                translated = true;
+            }
+            if (Keyboard[Key.S])
+            {
+                direction -= camera.Direction * Config.playerDirectionMagnitude;
+                translated = true;
+            }
+            if (Keyboard[Key.A])
+            {
+                camera.Right = camera.Up.Cross(camera.Direction);
+                direction += camera.Right * Config.playerDirectionMagnitude;
+                translated = true;
+            }
+            if (Keyboard[Key.D])
+            {
+                camera.Right = camera.Up.Cross(camera.Direction);
+                direction -= camera.Right * Config.playerDirectionMagnitude;
+                translated = true;
+            }
 
 
             if (Keyboard[Key.T])
@@ -466,22 +466,22 @@ namespace Aletha
                 camera.Fly(-playerDirectionMagnitude * movementSpeed);
             }
 
-            if (Keyboard[Key.W])
-            {
-                camera.Walk(playerDirectionMagnitude * movementSpeed);
-            }
-            if (Keyboard[Key.S])
-            {
-                camera.Walk(-playerDirectionMagnitude * movementSpeed);
-            }
-            if (Keyboard[Key.A])
-            {
-                camera.Strafe(playerDirectionMagnitude * movementSpeed);
-            }
-            if (Keyboard[Key.D])
-            {
-                camera.Strafe(-playerDirectionMagnitude * movementSpeed);
-            }
+            //if (Keyboard[Key.W])
+            //{
+            //    camera.Walk(playerDirectionMagnitude * movementSpeed);
+            //}
+            //if (Keyboard[Key.S])
+            //{
+            //    camera.Walk(-playerDirectionMagnitude * movementSpeed);
+            //}
+            //if (Keyboard[Key.A])
+            //{
+            //    camera.Strafe(playerDirectionMagnitude * movementSpeed);
+            //}
+            //if (Keyboard[Key.D])
+            //{
+            //    camera.Strafe(-playerDirectionMagnitude * movementSpeed);
+            //}
 
             if (Keyboard[Key.PageUp])
             {
@@ -573,10 +573,10 @@ namespace Aletha
                 camera.ApplyRotation();
             }
 
-            if (translated)
-            {
-                //camera.move(direction, frameTime);
-            }
+            //if (translated)
+            //{
+                camera.move(direction, frameTime);
+            //}
 
 
             //playerMover.move(vec3(direction),frameTime);
