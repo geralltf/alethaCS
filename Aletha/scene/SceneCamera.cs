@@ -50,7 +50,7 @@ namespace X3D.Engine
         public Vector3 Direction;
         public Vector3 movement;
 
-        public Vector3 DollyDirection = Vector3.UnitZ;
+        public Vector3 DollyDirection = Vector3.UnitY;
         public Vector3 Scale = Vector3.One;
         public Vector2 OrbitLocalOrientation = Vector2.Zero;
 
@@ -96,12 +96,12 @@ namespace X3D.Engine
 
             Right = Vector3.UnitX;
 
-            Forward = Vector3.UnitZ;
+            Forward = Vector3.UnitY;
 
             Direction = Forward;
 
             //Mouse Navigation parameters
-            Up = Vector3.UnitY;
+            Up = Vector3.UnitZ;
 
             //Position = Origin = movement = new Vector3(0, 0, -2); /*
             Position = Origin = movement = Vector3.Zero; // Q3 // */
@@ -247,7 +247,7 @@ namespace X3D.Engine
             //MakeOrthogonal();
 
 
-            Vector3 lookat = QuaternionExtensions.Rotate(Orientation, Vector3.UnitZ);
+            Vector3 lookat = QuaternionExtensions.Rotate(Orientation, Vector3.UnitY);
             Vector3 forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
             Vector3 up = Vector3.UnitY;
             Vector3 left = up.Cross(forward);
@@ -290,7 +290,7 @@ namespace X3D.Engine
             //Orientation = (new Quaternion(left, Amount.X)) * Orientation;
             //Orientation = (new Quaternion(forward, Amount.Z)) * Orientation;
 
-            Orientation = QuaternionExtensions.EulerToQuat(-camera_pitch, -camera_yaw, 0);
+            Orientation = QuaternionExtensions.EulerToQuat(0, camera_yaw, camera_pitch);
 
             //roll = QuaternionExtensions.EulerToQuat(0, 0, -camera_roll);
             //roll.Conjugate();
@@ -340,7 +340,7 @@ namespace X3D.Engine
 
             var cam = this.Position;
             Vector3 moveTo = cam;
-            Vector3 pos = Vector3.UnitZ * -1.0f;
+            Vector3 pos = Vector3.UnitY * -1.0f;
 
             moveTo = moveTo + pos;
             Position = moveTo;
@@ -359,7 +359,7 @@ namespace X3D.Engine
 
             var cam = this.Position; // clone
             Vector3 moveTo = cam;
-            Vector3 pos = Vector3.UnitZ;
+            Vector3 pos = Vector3.UnitY;
 
             moveTo = moveTo + pos;
             this.Position = moveTo;
@@ -427,16 +427,16 @@ namespace X3D.Engine
 
         public void Walk(float magnitude)
         {
-            Vector3 lookat = QuaternionExtensions.Rotate(Orientation, Vector3.UnitZ);
+            Vector3 lookat = QuaternionExtensions.Rotate(Orientation, Vector3.UnitY);
 
             Position += lookat * magnitude;
         }
 
         public void Strafe(float magnitude)
         {
-            Vector3 lookat = QuaternionExtensions.Rotate(Orientation, Vector3.UnitZ);
-            Vector3 forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-            Vector3 up = Vector3.UnitY;
+            Vector3 lookat = QuaternionExtensions.Rotate(Orientation, Vector3.UnitY);
+            Vector3 forward = new Vector3(lookat.X, lookat.Y, 0).Normalized();
+            Vector3 up = Vector3.UnitZ;
             Vector3 left = up.Cross(forward);
 
             Position += left * magnitude;
@@ -444,7 +444,7 @@ namespace X3D.Engine
 
         public void Fly(float units)
         {
-            Vector3 up = Vector3.UnitY;
+            Vector3 up = Vector3.UnitZ;
 
             Position += up * units;
         }
@@ -610,7 +610,8 @@ namespace X3D.Engine
             camera_pitch = OriginRotation.X * MathHelpers.PiOver180;
             camera_yaw = OriginRotation.Z * MathHelpers.PiOver180;
 
-            Orientation = QuaternionExtensions.EulerToQuat(-camera_pitch, -camera_yaw, 0);
+            Orientation = QuaternionExtensions.QuaternionFromEulerAnglesRad(0, camera_yaw, camera_pitch);
+            //Orientation = QuaternionExtensions.EulerToQuat(0, camera_yaw, -camera_pitch);
         }
     }
 }

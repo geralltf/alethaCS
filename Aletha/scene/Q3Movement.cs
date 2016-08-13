@@ -92,7 +92,7 @@ namespace Aletha
 
         public void move(Vector3 direction, float frameTime)
         {
-            Config.q3movement_frameTime = frameTime * 0.0075f;
+            Config.q3movement_frameTime = frameTime * 10.0f;
 
             this.groundCheck();
 
