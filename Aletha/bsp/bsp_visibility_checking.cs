@@ -20,7 +20,7 @@ namespace Aletha.bsp
             }
 
             var i = (visCluster * BspCompiler.visSize) + (testCluster >> 3);
-            ushort visSet = BspCompiler.visBuffer[i];
+            byte visSet = BspCompiler.visBuffer[i];
 
             return ((visSet > 0) & (1 << ((int)testCluster & 7)) != 0);
         }
@@ -81,9 +81,9 @@ namespace Aletha.bsp
                 }
             }
 
-            ushort[] ar = new ushort[BspCompiler.visSize];
+            byte[] ar = new byte[BspCompiler.visSize];
 
-            for (var i = 0; i < BspCompiler.visSize; ++i)
+            for (int i = 0; i < BspCompiler.visSize; ++i)
             {
                 ar[i] = BspCompiler.visBuffer[(curLeaf.cluster * BspCompiler.visSize) + i];
             }

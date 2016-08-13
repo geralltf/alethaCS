@@ -83,11 +83,7 @@ namespace Aletha
 
         public String getSource()
         {
-            string src = @"
-#ifdef GL_ES 
-precision highp float; 
-#endif 
-";
+            string src = @"";
   
             foreach(var kp in this.attrib)
             {

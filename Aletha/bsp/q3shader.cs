@@ -500,7 +500,7 @@ namespace Aletha.bsp
                 {
                     case "rotate":
                         shader.addLines(
-                            "float r = " + ShaderBuilder.toStringAsFixed(tcMod.angle, 4) + " * time;",
+                            string.Format("float r = {0} * time;", ShaderBuilder.toStringAsFixed(tcMod.angle, 4)),
                             "vTexCoord -= vec2(0.5, 0.5);",
                             "vTexCoord = vec2(vTexCoord.s * cos(r) - vTexCoord.t * sin(r), vTexCoord.t * cos(r) + vTexCoord.s * sin(r));",
                             "vTexCoord += vec2(0.5, 0.5);"
@@ -511,7 +511,7 @@ namespace Aletha.bsp
                         double sSpeed = tcMod.sSpeed; // was tcMod['sSpeed'].toFixed(4)
                         double tSpeed = tcMod.tSpeed;
 
-                        shader.addLines("vTexCoord += vec2(" + ShaderBuilder.toStringAsFixed(sSpeed, 4) + " * time, " + ShaderBuilder.toStringAsFixed(tSpeed, 4) + " * time);");
+                        shader.addLines(string.Format("vTexCoord += vec2({0} * time, {1} * time); ", ShaderBuilder.toStringAsFixed(sSpeed, 4), ShaderBuilder.toStringAsFixed(tSpeed, 4)));
                         break;
 
                     case "scale":

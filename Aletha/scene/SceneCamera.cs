@@ -538,9 +538,9 @@ namespace X3D.Engine
         public Vector3 applyMovement(Vector3 direction)
         {
             // HasChanges = true;
-            //Position = direction;
-            //return Position;
-            return Position = direction;
+            Position = direction;
+            return Position;
+            //return Position = direction;
         }
 
 
@@ -601,12 +601,16 @@ namespace X3D.Engine
         public void SetOrigin(Vector3 origin, Vector3 rotation)
         {
             Position = Origin = origin;
-            Rotation = OriginRotation = rotation;
+            Rotation = rotation;
+            OriginRotation = rotation;
+
             Orientation = Quaternion.Identity;
             //xAngle = 0.0;
 
             camera_pitch = OriginRotation.X * MathHelpers.PiOver180;
             camera_yaw = OriginRotation.Z * MathHelpers.PiOver180;
+
+            Orientation = QuaternionExtensions.EulerToQuat(-camera_pitch, -camera_yaw, 0);
         }
     }
 }

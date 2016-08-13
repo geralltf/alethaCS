@@ -235,16 +235,26 @@ namespace Aletha.bsp
         public float ReadFloat()
         {
             float value;
-            
-            byte[] tmp = new byte[4];
+            FloatArrayBuffer bf_wfa;
+            byte[] tmp;
+            int offset_float;
 
-            Array.Copy(this.data, (int)this.offset, tmp, 0, 4);
+            offset_float = sizeof(float);
 
-            FloatArrayBuffer bf_wfa = new FloatArrayBuffer(tmp);
+            tmp = new byte[offset_float];
+
+            Array.Copy(this.data, (int)this.offset, tmp, 0, tmp.Length);
+
+            //tmp[0] = ((byte)(tmp[0] & (byte)0xff));
+            //tmp[1] = ((byte)(tmp[1] & (byte)0xff));
+            //tmp[2] = ((byte)(tmp[2] & (byte)0xff));
+            //tmp[3] = ((byte)(tmp[3] & (byte)0xff));
+
+            bf_wfa = new FloatArrayBuffer(tmp);
 
             value = bf_wfa.Floats[0]; // implicit typecast combining 4 bytes into float
 
-            this.offset += sizeof(float);
+            this.offset += (ulong)offset_float;
 
             return value;
         }

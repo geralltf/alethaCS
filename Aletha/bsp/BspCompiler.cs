@@ -21,7 +21,7 @@ namespace Aletha.bsp
         public static List<Brush> brushes;
         public static List<BrushSide> brushSides;
         public static List<long> leafFaces, leafBrushes;
-        public static ushort[] visBuffer;
+        public static byte[] visBuffer;
         public static long visSize;
         public static List<shader_p> shaders; // This needs to be kept here for collision detection (indicates non-solid surfaces)
 
@@ -213,7 +213,7 @@ namespace Aletha.bsp
 
             // Compile index list
             //Uint16List indices = new Uint16List(0);
-            List<uint> lst_indices = new List<uint>();
+            List<ushort> lst_indices = new List<ushort>();
 
 			for(int i = 0; i <  shaders.Count; ++i) 
 			{
@@ -230,7 +230,7 @@ namespace Aletha.bsp
 
 						for(int k = 0; k < face.meshVertCount; ++k) 
 						{
-							lst_indices.Add((uint)(face.vertex + meshVerts[face.meshVert + k]));
+							lst_indices.Add((ushort)(face.vertex + meshVerts[face.meshVert + k]));
 						}
 						shader.elementCount += (int)face.meshVertCount;
 					}
@@ -238,7 +238,7 @@ namespace Aletha.bsp
 				shader.faces = null; // Don't need to send this to the render thread.
 			}
 
-            uint[] indices = lst_indices.ToArray();
+            ushort[] indices = lst_indices.ToArray();
 
             //         indices = new Uint16List(lst_indices.length);
             //indices.setAll(0,lst_indices);

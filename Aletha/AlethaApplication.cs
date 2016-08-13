@@ -21,7 +21,6 @@ namespace Aletha
         public static int ResHeight = 600;
         public static GraphicsMode GraphicsMode = new GraphicsMode(32, 16, 0, 4);
         Matrix4 leftViewMat;
-        Matrix4 leftProjMat;
 
 		bool FULLSCREEN = false;
         bool GAME_INIT_MODE = false;
@@ -29,13 +28,17 @@ namespace Aletha
 
         int lastIndex;
         bool drawMap = true;
-        float xAngle = 0.0f, yAngle = 0.0f;
+        //float xAngle = 0.0f, yAngle = 0.0f;
 
         long startTime;
         long lastTimestamp;
         Vector2 mouseDelta;
 
-        bool? lockMouseCursor;
+        bool? lockMouseCursor = true;
+        private bool fastFlySpeed = false;
+        private bool slowFlySpeed = false;
+        public static float playerDirectionMagnitude = 1.0f;
+        public static float movementSpeed = 1.0f;
 
         public static int request_number = 0;
 
@@ -90,7 +93,68 @@ namespace Aletha
             NativeWindowContext = this;
             CurrentApplication = this;
         }
-     
+
+        // "Respawns" the player at a specific spawn point. Passing -1 will move the player to the next spawn point.
+        public void RespawnPlayer(int index)
+        {
+            if (q3bsp.entities != null && camera != null && camera.playerMover != null)
+            {
+                String spawn_point_param_name;
+                List<Q3Entity> spawns;
+
+
+                spawn_point_param_name = "info_player_deathmatch"; // Quake 3 bsp file
+                spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name || e.classname == spawn_point_param_name).ToList();
+
+                if (!spawns.Any())
+                {
+                    spawn_point_param_name = "info_player_start"; // TREMULOUS bsp file
+
+                    spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name || e.classname == spawn_point_param_name).ToList();
+                }
+
+
+
+                if (index == -1)
+                {
+                    index = (lastIndex + 1) % spawns.Count;
+                }
+                lastIndex = index;
+
+                Q3Entity spawnPoint = spawns[index]; //spawns.First(e => e.Index == index);
+                //Entity spawnPoint = q3bsp.entities[spawn_point_param_name];
+
+                float zAngle;
+                float xAngle;
+
+                if (spawnPoint.Fields.ContainsKey("angle"))
+                {
+                    zAngle = (float)((double)(spawnPoint.Fields["angle"]));
+                }
+                else
+                {
+                    zAngle = 0.0f;
+                }
+
+                zAngle = -(zAngle);
+                zAngle *= ((float)Math.PI / 180.0f) + ((float)Math.PI * 0.5f); // Negative angle in radians + 90 degrees
+
+                xAngle = 0.0f;
+
+                Vector3 rotation = new Vector3(xAngle, 0.0f, zAngle);
+
+                Vector3 origin = (Vector3)spawnPoint.Fields["origin"];
+                origin.Z += 30; // Start a little ways above the floor
+
+                camera.SetOrigin(origin, rotation);
+
+                camera.velocity = Vector3.Zero;
+
+                //camera.Reset();
+            }
+        }
+
+        #region Rendering Methods
 
         protected override void OnLoad(EventArgs e)
         {
@@ -134,12 +198,10 @@ namespace Aletha
 			GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);  // Really Nice Perspective Calculations
 
 			leftViewMat = Matrix4.Identity;
-			leftProjMat = Matrix4.Identity;
 
             startTime = DateTime.Now.Ticks;
             lastTimestamp = startTime;
 
-            leftProjMat = camera.Projection;
         }
 
 		private void initMap()
@@ -160,7 +222,7 @@ namespace Aletha
 
             Console.WriteLine("[loaded] bsp scene");
 
-            respawnPlayer(0);
+            RespawnPlayer(0);
 
             OnResize(null);
 
@@ -187,97 +249,7 @@ namespace Aletha
             }
         }
 
-        private void bsp_initilised(q3bsptree bsp)
-		{
-			camera.playerMover = new Q3Movement(camera,bsp);
 
-            // although we have the bsp tree
-            // the rest of map not fully loaded yet
-        }
-
-		private void bsp_entities_initilised(List<Q3Entity> entities)
-        {
-            // Process entities loaded from the map  
-            string msg;
-            string fields;
-
-            foreach (Q3Entity entity in entities)
-            {
-
-
-                msg = string.Format("[~entity~] {3}-{0} {1} {2} ", entity.classname, entity.targetname, entity.name, entity.Index);
-                fields = "";
-
-                foreach (var field in entity.Fields)
-                {
-                    fields += " [" + field.Key + "=" + field.Value +"]";
-                }
-
-                Console.WriteLine(msg + " fields=" + fields.Trim());
-
-            }
-        }
-
-        
-        // "Respawns" the player at a specific spawn point. Passing -1 will move the player to the next spawn point.
-        private void respawnPlayer(int index) 
-        {
-            if (q3bsp.entities != null && camera != null && camera.playerMover != null)
-            {
-                String spawn_point_param_name;
-                List<Q3Entity> spawns;
-                
-
-                spawn_point_param_name = "info_player_deathmatch"; // Quake 3 bsp file
-                spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name || e.classname == spawn_point_param_name).ToList();
-
-                if (!spawns.Any())
-                {
-                    spawn_point_param_name = "info_player_start"; // TREMULOUS bsp file
-
-                    spawns = q3bsp.entities.Where(e => e.name == spawn_point_param_name || e.classname == spawn_point_param_name).ToList();
-                }
-
-                
-
-                if (index == -1)
-                {
-                    index = (lastIndex + 1) % spawns.Count;
-                }
-                lastIndex = index;
-
-                Q3Entity spawnPoint = spawns[index]; //spawns.First(e => e.Index == index);
-                //Entity spawnPoint = q3bsp.entities[spawn_point_param_name];
-
-                float zAngle;
-                float xAngle;
-
-                if (spawnPoint.Fields.ContainsKey("angle"))
-                {
-                    zAngle = (float)((double)(spawnPoint.Fields["angle"]));
-                }
-                else
-                {
-                    zAngle = 0.0f;
-                }
-
-                zAngle = -(zAngle);
-                zAngle *= ((float)Math.PI / 180.0f) + ((float)Math.PI * 0.5f); // Negative angle in radians + 90 degrees
-
-                xAngle = 0.0f;
-
-                Vector3 rotation = new Vector3(xAngle, 0.0f, zAngle);
-
-                Vector3 origin = (Vector3)spawnPoint.Fields["origin"];
-                origin.Z += 30; // Start a little ways above the floor
-
-                camera.SetOrigin(origin, rotation);
-
-                camera.velocity = Vector3.Zero;
-
-                //camera.Reset();
-            }
-        }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -290,8 +262,7 @@ namespace Aletha
                 return;
             }
 
-            
-            drawFrame((float)e.Time);
+            RenderQuakeBSP((float)e.Time);
 
             if (e != null)
             {
@@ -309,7 +280,7 @@ namespace Aletha
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            updateInput((float)e.Time);
+            ApplyKeyBindings((float)e.Time);
 
             if (isFullscreen)
             {
@@ -322,13 +293,21 @@ namespace Aletha
                 mouseDelta *= 0.0005f;
                 mouseDelta.Y += 0.009999956f; // mouse not in exact center
 
-                updateCamera();
+                UpdateCamera();
 
                 LockMouseCursor();
             }
-
         }
-        private void updateCamera()
+
+
+
+
+
+        #endregion
+
+        #region Private Methods
+
+        private void UpdateCamera()
         {
             Vector3 direction = Vector3.Zero;
 
@@ -350,38 +329,22 @@ namespace Aletha
             camera.ApplyRotation();
         }
 
-        private void LockMouseCursor()
+        private void RenderQuakeBSP(float frameTime)
         {
-            if (lockMouseCursor.HasValue == false)
-            {
-                var result = System.Windows.Forms.MessageBox.Show(
-                    "Do you want to allow this application to lock the mouse cursor?\n (Note if you allow the lock, you can quit the application by pressing 'q')",
-                    "Lock Mouse Cursor",
-                    System.Windows.Forms.MessageBoxButtons.YesNo);
+            Viewport leftViewport;
 
-                lockMouseCursor = (result == System.Windows.Forms.DialogResult.Yes);
-            }
+            GL.DepthMask(true);
 
-            if (lockMouseCursor.HasValue && lockMouseCursor.Value == true)
-            {
-                //        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(window.Bounds.Left + (window.Bounds.Width / 2),
-                //window.Bounds.Top + (window.Bounds.Height / 2));
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthMask(true);
+            GL.DepthFunc(DepthFunction.Lequal);
 
+            if (map == null || camera.playerMover == null) { return; }
 
+            // Matrix setup
+            leftViewMat = camera.ViewMatrix;
 
-                if (this.isFullscreen)
-                {
-                    System.Drawing.Rectangle screen = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea;
-
-                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(screen.Width / 2,
-                        screen.Height / 2);
-                }
-
-            }
-        }
-
-        public Matrix4 getViewMatrix()
-        {
             camera.ApplyTransformations();
 
             if (camera.HasChanges)
@@ -389,41 +352,11 @@ namespace Aletha
                 //camera_onchange(camera);
             }
 
-            //display_player_position(camera.Position);
-
-
-            //Matrix4 cameraTransl = Matrix4.CreateTranslation(camera.Position);
-            //Matrix4 cameraRot = Matrix4.CreateFromQuaternion(camera.Orientation);
-            //Matrix4 MVP = cameraTransl * cameraRot; 
-
-            return camera.ViewMatrix;
-            //return MVP;
-        }
-
-        private void drawFrame(float frameTime)
-        {
-            Viewport leftViewport;
-
-            // Clear back buffer but not color buffer (we expect the entire scene to be overwritten)
-            GL.DepthMask(true);
-            
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthMask(true);
-            GL.DepthFunc(DepthFunction.Lequal);
-
-            //gl.clearColor(0.0, 0.0, 0.0,1.0);
-
-            if (map == null || camera.playerMover == null) { return; }
-
-            // Matrix setup
-            leftViewMat = getViewMatrix();
-
             leftViewport = new Viewport();
-            leftViewport.width = (double)this.Width;
-            leftViewport.height = (double)this.Height;
-            leftViewport.x = 0.0;
-            leftViewport.y = 0.0;
+            leftViewport.width = this.Width;
+            leftViewport.height = this.Height;
+            leftViewport.x = 0.0f;
+            leftViewport.y = 0.0f;
 
             if (drawMap)
             {
@@ -431,39 +364,106 @@ namespace Aletha
 
                 if (q3bsp.skybox_env != null)
                 {
-                    q3bsp.skybox_env.render(frameTime, leftViewport, leftViewMat, leftProjMat);
+                    q3bsp.skybox_env.Render(frameTime, leftViewport, leftViewMat, camera.Projection);
                 }
 
-                q3bsp.draw(leftViewMat, leftProjMat, leftViewport, frameTime);
+                q3bsp.Render(leftViewMat, camera.Projection, leftViewport, frameTime);
             }
 
             //player.RenderPlayerModels(gl, leftViewMat, leftProjMat, leftViewport);
         }
 
-        private void updateInput(float frameTime)
+        private void bsp_initilised(q3bsptree bsp)
+        {
+            camera.playerMover = new Q3Movement(camera, bsp);
+
+            // although we have the bsp tree
+            // the rest of map not fully loaded yet
+        }
+
+        private void bsp_entities_initilised(List<Q3Entity> entities)
+        {
+            // Process entities loaded from the map  
+            string msg;
+            string fields;
+
+            foreach (Q3Entity entity in entities)
+            {
+
+
+                msg = string.Format("[~entity~] {3}-{0} {1} {2} ", entity.classname, entity.targetname, entity.name, entity.Index);
+                fields = "";
+
+                foreach (var field in entity.Fields)
+                {
+                    fields += " [" + field.Key + "=" + field.Value + "]";
+                }
+
+                Console.WriteLine(msg + " fields=" + fields.Trim());
+
+            }
+        }
+
+        private void ApplyKeyBindings(float frameTime)
         {
             if (camera.playerMover == null) { return; }
 
             Vector3 direction = Vector3.Zero;
+            bool translated = false;
 
+            slowFlySpeed = Keyboard[Key.AltLeft];
+            fastFlySpeed = Keyboard[Key.ShiftLeft];
+            movementSpeed = fastFlySpeed ? 10.0f : 1.0f;
+            movementSpeed = slowFlySpeed ? 0.01f : movementSpeed;
+
+            //if (Keyboard[Key.W])
+            //{
+            //    direction += camera.Direction * Config.playerDirectionMagnitude;
+            //    translated = true;
+            //}
+            //if (Keyboard[Key.S])
+            //{
+            //    direction -= camera.Direction * Config.playerDirectionMagnitude;
+            //    translated = true;
+            //}
+            //if (Keyboard[Key.A])
+            //{
+            //    camera.Right = camera.Up.Cross(camera.Direction);
+            //    direction += camera.Right * Config.playerDirectionMagnitude;
+            //    translated = true;
+            //}
+            //if (Keyboard[Key.D])
+            //{
+            //    camera.Right = camera.Up.Cross(camera.Direction);
+            //    direction -= camera.Right * Config.playerDirectionMagnitude;
+            //    translated = true;
+            //}
+
+
+            if (Keyboard[Key.T])
+            {
+                camera.Fly(playerDirectionMagnitude * movementSpeed);
+            }
+            if (Keyboard[Key.G])
+            {
+                camera.Fly(-playerDirectionMagnitude * movementSpeed);
+            }
 
             if (Keyboard[Key.W])
             {
-                direction += camera.Direction * Config.playerDirectionMagnitude;
+                camera.Walk(playerDirectionMagnitude * movementSpeed);
             }
             if (Keyboard[Key.S])
             {
-                direction -= camera.Direction * Config.playerDirectionMagnitude;
+                camera.Walk(-playerDirectionMagnitude * movementSpeed);
             }
             if (Keyboard[Key.A])
             {
-                camera.Right = camera.Up.Cross(camera.Direction);
-                direction += camera.Right * Config.playerDirectionMagnitude;
+                camera.Strafe(playerDirectionMagnitude * movementSpeed);
             }
             if (Keyboard[Key.D])
             {
-                camera.Right = camera.Up.Cross(camera.Direction);
-                direction -= camera.Right * Config.playerDirectionMagnitude;
+                camera.Strafe(-playerDirectionMagnitude * movementSpeed);
             }
 
             if (Keyboard[Key.PageUp])
@@ -556,18 +556,47 @@ namespace Aletha
                 camera.ApplyRotation();
             }
 
+            if (translated)
+            {
+                //camera.move(direction, frameTime);
+            }
 
 
             //playerMover.move(vec3(direction),frameTime);
 
-            camera.move(direction, frameTime);
             //camera.update(frameTime);
         }
 
+        private void LockMouseCursor()
+        {
+            if (lockMouseCursor.HasValue == false)
+            {
+                var result = System.Windows.Forms.MessageBox.Show(
+                    "Do you want to allow this application to lock the mouse cursor?\n (Note if you allow the lock, you can quit the application by pressing 'q')",
+                    "Lock Mouse Cursor",
+                    System.Windows.Forms.MessageBoxButtons.YesNo);
+
+                lockMouseCursor = (result == System.Windows.Forms.DialogResult.Yes);
+            }
+
+            if (lockMouseCursor.HasValue && lockMouseCursor.Value == true)
+            {
+                //        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(window.Bounds.Left + (window.Bounds.Width / 2),
+                //window.Bounds.Top + (window.Bounds.Height / 2));
 
 
 
+                if (this.isFullscreen)
+                {
+                    System.Drawing.Rectangle screen = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea;
 
+                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(screen.Width / 2,
+                        screen.Height / 2);
+                }
 
+            }
+        }
+
+        #endregion
     }
 }

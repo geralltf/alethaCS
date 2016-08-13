@@ -159,7 +159,7 @@ namespace Aletha
             GL.BindTexture(TextureTarget.TextureCubeMap, skymap);
         }
 
-        public void render(float time, Viewport leftViewport, Matrix4 leftViewMat, Matrix4 leftProjMat)
+        public void Render(float time, Viewport leftViewport, Matrix4 leftViewMat, Matrix4 leftProjMat)
         {
             //q3bsp.skybox_env.bindSkyTexture(gl, stage, program, time);
 

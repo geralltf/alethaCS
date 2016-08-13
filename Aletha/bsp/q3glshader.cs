@@ -254,9 +254,10 @@ namespace Aletha
             {
                 q3bsp.skybox_env = skybox.loadFromShader(surface, shader);
             }
-            for (var i = 0; i < shader.stages.Count; ++i)
+            for (int i = 0; i < shader.stages.Count; ++i)
             {
                 stage_gl stage = shader.stages[i];
+
                 if (stage.map != null)
                 {
                     loadTexture(shader, surface, stage);

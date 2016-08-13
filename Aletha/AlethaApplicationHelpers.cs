@@ -26,7 +26,7 @@ namespace Aletha
             }
             if (e.Key == Key.R)
             {
-                respawnPlayer(-1);
+                RespawnPlayer(-1);
             }
             if (e.Key == Key.I)
             {

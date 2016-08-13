@@ -349,6 +349,7 @@ namespace Aletha.bsp
                 shader.indexOffset = 0;
                 shader.elementCount = 0;
                 shader.visible = true;
+
                 elements.Add(shader);
             }
 
@@ -572,7 +573,7 @@ namespace Aletha.bsp
             Leaf leave;
 
             src.Seek(lump.offset);
-            for (var i = 0; i < count; ++i)
+            for (int i = 0; i < count; ++i)
             {
                 leave = new Leaf()
                 {
@@ -686,9 +687,9 @@ namespace Aletha.bsp
             int size = src.ReadInt32();
 
             int byteCount = vecCount * size;
-            ushort[] elements = new ushort[byteCount];
+            byte[] elements = new byte[byteCount];
 
-            for (var i = 0; i < byteCount; ++i)
+            for (int i = 0; i < byteCount; ++i)
             {
                 elements[i] = src.ReadUByte();
             }

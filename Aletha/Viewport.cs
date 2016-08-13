@@ -7,8 +7,8 @@ namespace Aletha
 {
     public class Viewport
     {
-        public double width, height;
-        public double x, y;
+        public float width, height;
+        public float x, y;
 
         public static Viewport Zero
         {

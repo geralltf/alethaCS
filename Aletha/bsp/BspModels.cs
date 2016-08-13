@@ -22,7 +22,7 @@ namespace Aletha.bsp
 
         // type = Geometry
         public float[] vertices;
-        public uint[] indices;
+        public ushort[] indices;
         public List<lightmap_t> lightmaps;
         public int size;
 
@@ -84,7 +84,7 @@ namespace Aletha.bsp
         public List<Brush> brushes;
         public List<BrushSide> brushSides;
         public List<shader_p> surfaces;
-        public ushort[] visBuffer;
+        public byte[] visBuffer;
         public long visSize;
     }
 
@@ -408,7 +408,7 @@ namespace Aletha.bsp
     }
     public class VisData
     {
-        public ushort[] buffer;
+        public byte[] buffer;
         public long size;
     }
 
