@@ -45,14 +45,15 @@ namespace Aletha
         public static SceneCamera camera;
         public static q3bsp map;
 
+        private static AutoResetEvent closureEvent;
+        private static BackgroundWorker bw;
+
         public static INativeWindow NativeWindowContext { get; set; }
 
         public static AlethaApplication CurrentApplication { get; set; }
 
         public static void Initilise()
         {
-            BackgroundWorker bw; // Have to use the BackgroundWorker to stop COM Interop flop x_x
-            AutoResetEvent closureEvent;
             AlethaApplication application;
 
             closureEvent = new AutoResetEvent(false);
@@ -77,8 +78,13 @@ namespace Aletha
 
             bw.RunWorkerAsync();
             closureEvent.WaitOne();
+        }
 
-			Console.ReadLine ();
+        public void Quit()
+        {
+            bw.CancelAsync();
+            closureEvent.Set();
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
 
         public AlethaApplication() : base(ResWidth, ResHeight, GraphicsMode)
@@ -415,6 +421,17 @@ namespace Aletha
             fastFlySpeed = Keyboard[Key.ShiftLeft];
             movementSpeed = fastFlySpeed ? 10.0f : 1.0f;
             movementSpeed = slowFlySpeed ? 0.01f : movementSpeed;
+
+            if (Keyboard[Key.Escape] || Keyboard[Key.Q])
+            {
+                // QUIT APPLICATION
+                if (this.WindowState == WindowState.Fullscreen)
+                {
+                    this.WindowState = WindowState.Normal;
+                }
+
+                Quit();
+            }
 
             //if (Keyboard[Key.W])
             //{
