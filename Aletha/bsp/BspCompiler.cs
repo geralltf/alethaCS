@@ -47,11 +47,11 @@ namespace Aletha.bsp
 				break;
 
 				case "trace":
-				    bsp_collision_detection.trace(msg.traceId, msg.start, msg.end, msg.radius, msg.slide);
+				    BspCollisionDetection.trace(msg.traceId, msg.start, msg.end, msg.radius, msg.slide);
 				break;
 
 				case "visibility":
-				    bsp_visibility_checking.buildVisibleList(bsp_visibility_checking.getLeaf(msg.pos));
+				    BspVisibilityChecking.buildVisibleList(BspVisibilityChecking.getLeaf(msg.pos));
 				break;
 
 				default:
@@ -190,7 +190,7 @@ namespace Aletha.bsp
                         });
 
                         // Build Bezier curve
-                        bsp_tess.Tesselate(face, verts, meshVerts, tesselationLevel);
+                        BspTess.Tesselate(face, verts, meshVerts, tesselationLevel);
 
 						for(int j = 0; j < face.vertCount; ++j) 
 						{

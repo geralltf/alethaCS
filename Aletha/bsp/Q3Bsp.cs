@@ -145,15 +145,15 @@ namespace Aletha.bsp
                     processEntities(entities);
                     break;
                 case "geometry":
-                    bsp_opengl_builders.buildBuffers(msg.vertices, msg.indices);
+                    BspOpenglBuilders.buildBuffers(msg.vertices, msg.indices);
                     surfaces = msg.surfaces;
                     bindShaders(); // compiles in another thread 
                     break;
                 case "lightmap":
-                    bsp_opengl_builders.buildLightmaps(msg.size, msg.lightmaps);
+                    BspOpenglBuilders.buildLightmaps(msg.size, msg.lightmaps);
                     break;
                 case "shaders":
-                    bsp_opengl_builders.buildShaders(msg.shaders);
+                    BspOpenglBuilders.buildShaders(msg.shaders);
                     break;
                 case "bsp":
                     bspTree = new q3bsptree(msg.bsp);
@@ -198,7 +198,7 @@ namespace Aletha.bsp
 
             q3shader.loadList(urls, (List<shader_t> shaders) =>
             {
-                bsp_opengl_builders.buildShaders(shaders);
+                BspOpenglBuilders.buildShaders(shaders);
             });
         }
 
@@ -462,12 +462,12 @@ namespace Aletha.bsp
                 shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
 
 
-                bsp_opengl_binders.bindShaderAttribs(shaderProgram);
+                BspOpenglBinders.bindShaderAttribs(shaderProgram);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, glshading.defaultTexture);
 
-                bsp_opengl_binders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+                BspOpenglBinders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
                 setViewport(leftViewport);
 
                 int i;
@@ -516,8 +516,8 @@ namespace Aletha.bsp
 
                     if (shaderProgram == null) { continue; }
 
-                    bsp_opengl_binders.bindShaderAttribs(shaderProgram);
-                    bsp_opengl_binders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+                    BspOpenglBinders.bindShaderAttribs(shaderProgram);
+                    BspOpenglBinders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
 
                     setViewport(leftViewport);
 
@@ -544,10 +544,10 @@ namespace Aletha.bsp
             glshading.setShader(shader);
             stage_gl stage = shader.stages[0];
             shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
-            bsp_opengl_binders.bindShaderAttribs(shaderProgram);
+            BspOpenglBinders.bindShaderAttribs(shaderProgram);
             GL.ActiveTexture(TextureUnit.Texture0);
 
-            bsp_opengl_binders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+            BspOpenglBinders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
             setViewport(leftViewport);
 
             for (int i = 0; i < modelSurfaces.Count; ++i)

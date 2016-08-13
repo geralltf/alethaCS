@@ -44,11 +44,11 @@
     <Compile Include="bsp\BspHelpers.cs" />
     <Compile Include="bsp\BspModels.cs" />
     <Compile Include="bsp\BspParser.cs" />
-    <Compile Include="bsp\bsp_collision_detection.cs" />
-    <Compile Include="bsp\bsp_tess.cs" />
-    <Compile Include="bsp\bsp_visibility_checking.cs" />
-    <Compile Include="bsp\bsp_opengl_binders.cs" />
-    <Compile Include="bsp\bsp_opengl_builders.cs" />
+    <Compile Include="bsp\BspCollisionDetection.cs" />
+    <Compile Include="bsp\BspTess.cs" />
+    <Compile Include="bsp\BspVisibilityChecking.cs" />
+    <Compile Include="bsp\BspOpenglBinders.cs" />
+    <Compile Include="bsp\BspOpenglBuilders.cs" />
     <Compile Include="bsp\Q3Bsp.cs" />
     <Compile Include="bsp\q3glshader.cs" />
     <Compile Include="bsp\q3shader.cs" />
