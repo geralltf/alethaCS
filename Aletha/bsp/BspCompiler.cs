@@ -269,9 +269,9 @@ namespace Aletha.bsp
                 vert = verticies[i];
 
                 // invert position
-                float tmp = vert.pos.X;
-                vert.pos.X = vert.pos.Z;
-                vert.pos.Z = tmp;
+                //float tmp = vert.pos.X;
+                //vert.pos.X = vert.pos.Z;
+                //vert.pos.Z = tmp;
 
                 vertices[offset++] = vert.pos.X;
                 vertices[offset++] = vert.pos.Y;
