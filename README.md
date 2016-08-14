@@ -1,2 +1,2 @@
 # alethaCS
-Experimental Quake 3 port to C#
+Quake 3 port to C# for educational purposes
