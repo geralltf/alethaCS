@@ -75,7 +75,12 @@ namespace Aletha
 
                         image = new Bitmap(url);
 
-                        AlethaApplication.incReqests();
+                        var newSize = GetTextureGLMaxSize(image);
+
+                        Rescale(ref image, newSize);
+
+
+                    AlethaApplication.incReqests();
                         AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
 
                         onloadComplete(texture, image);
@@ -91,6 +96,66 @@ namespace Aletha
 
                 //fetch_update(url);
             }
+        }
+
+        public static void Rescale(ref Bitmap image, Size newSize)
+        {
+            if (image.Width != newSize.Width || image.Height != newSize.Height)
+            {
+                /* Scale the image according to OpenGL requirements */
+                Image newImage = image.GetThumbnailImage(newSize.Width, newSize.Height, null, IntPtr.Zero);
+
+                image.Dispose();
+                image = (Bitmap)newImage;
+            }
+        }
+
+        public static Size GetTextureGLMaxSize(Bitmap image)
+        {
+            Size result;
+            int[] textureMaxSize;
+            int glTexWidth, 
+                glTexHeight;
+
+            /*	Get the maximum texture size supported by OpenGL: */
+            textureMaxSize = new int[] { 0 };
+            GL.GetInteger(GetPName.MaxTextureSize, textureMaxSize);
+            //gl.GetInteger(OpenGL.GL_MAX_TEXTURE_SIZE,textureMaxSize);
+
+            /*	Find the target width and height sizes, which is just the highest
+             *	posible power of two that'll fit into the image. */
+            glTexWidth = textureMaxSize[0];
+            glTexHeight = textureMaxSize[0];
+            for (int size = 1; size <= textureMaxSize[0]; size *= 2)
+            {
+                if (image.Width < size)
+                {
+                    glTexWidth = size / 2;
+                    break;
+                }
+                if (image.Width == size)
+                    glTexWidth = size;
+
+            }
+
+            for (int size = 1; size <= textureMaxSize[0]; size *= 2)
+            {
+                if (image.Height < size)
+                {
+                    glTexHeight = size / 2;
+                    break;
+                }
+                if (image.Height == size)
+                    glTexHeight = size;
+            }
+
+            result = new Size()
+            {
+                Width = glTexWidth,
+                Height = glTexHeight
+            };
+
+            return result;
         }
     }
 }

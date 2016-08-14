@@ -102,7 +102,6 @@ namespace Aletha
                 direction = MathHelpers.Clamp(direction, -camera.walkMovementSpeed, camera.walkMovementSpeed); // direction.Normalize();
             }
 
-
             if (camera.onGround)
             {
                 this.walkMove(direction);

@@ -429,13 +429,10 @@ namespace Aletha.bsp
                 // Model shader surfaces (can bind shader once and draw all of them very quickly)
                 if (modelSurfaces.Count > 0)
                 {
-                    //render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+                    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
                 }
 
-
-                //BUG: at the moment with effect surfaces
-
-                //render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+                render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
             }
 
             //render_models(leftViewMat, leftProjMat, leftViewport, time);
@@ -528,18 +525,7 @@ namespace Aletha.bsp
                     setViewport(leftViewport);
 
                     // Draw all geometry that uses this textures
-                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
-
-                    //ErrorCode result = GL.GetError();
-
-                    //if (result == ErrorCode.NoError)
-                    //{
-                    //    Console.WriteLine("[effect surfaces]");
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine("[ERROR effect surfaces]");
-                    //}
+                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
                 }
             }
         }
@@ -563,7 +549,7 @@ namespace Aletha.bsp
                 shader_p surface = modelSurfaces[i];
                 stage_gl stage2 = surface.shader.stages[0];
                 GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
-                GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
+                GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
             }
 
         }

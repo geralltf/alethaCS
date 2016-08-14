@@ -114,13 +114,13 @@ namespace Aletha
 
             loadSkyTexture(shader, surface, (int texture) =>
             {
-                sky.skymap = texture;
+                //.skymap = texture;
             },
             (int texture) =>
             {
                 sky.skymap = texture;
 
-                //gl.generateMipmap(RenderingContext.TEXTURE_CUBE_MAP);
+                //GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
             });
 
             return sky;
@@ -156,7 +156,6 @@ namespace Aletha
             //if(skymap == null) { skymap = q3bsp.glshading.defaultTexture; }
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            //gl.uniform1i(program.uniform['texture'], 0);
             GL.BindTexture(TextureTarget.TextureCubeMap, skymap);
         }
 
@@ -215,11 +214,15 @@ namespace Aletha
 
                             //bindSkyTexture(null, shaderProgram, time);
 
+                            GL.Uniform1(shaderProgram.uniform["texture"], 0);
+
+                            bindSkySingleTexture(time);
+
                             skybox.bindSkyAttribs(shaderProgram);
 
                             skybox.bindSkyMatrix(shaderProgram, leftViewMat, leftProjMat);
 
-                            q3bsp.setViewport(leftViewport);
+                            //q3bsp.setViewport(leftViewport);
 
 
                             GL.Disable(EnableCap.DepthTest);
@@ -291,40 +294,6 @@ namespace Aletha
                                        false,
                                        Config.q3bsp_sky_vertex_stride,
                                        3 * 4);
-            }
-
-
-            if (shader.attrib.ContainsKey("lightCoord"))
-            {
-                GL.EnableVertexAttribArray(shader.attrib["lightCoord"]);
-                GL.VertexAttribPointer(shader.attrib["lightCoord"],
-                                       2,
-                                       VertexAttribPointerType.Float,
-                                       false,
-                                       Config.q3bsp_vertex_stride,
-                                       5 * sizeof(float));
-            }
-
-            if (shader.attrib.ContainsKey("normal"))
-            {
-                GL.EnableVertexAttribArray(shader.attrib["normal"]);
-                GL.VertexAttribPointer(shader.attrib["normal"],
-                    3,
-                    VertexAttribPointerType.Float,
-                    false,
-                    Config.q3bsp_vertex_stride,
-                    7 * sizeof(float));
-            }
-
-            if (shader.attrib.ContainsKey("color"))
-            {
-                GL.EnableVertexAttribArray(shader.attrib["color"]);
-                GL.VertexAttribPointer(shader.attrib["color"],
-                    4,
-                    VertexAttribPointerType.Float,
-                    false,
-                    Config.q3bsp_vertex_stride,
-                    10 * sizeof(float));
             }
         }
 
