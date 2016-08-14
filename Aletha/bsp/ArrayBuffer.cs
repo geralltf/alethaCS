@@ -51,6 +51,9 @@ namespace Aletha.bsp
         protected int[] sints;
 
         [FieldOffset(8)]
+        protected double[] doubles;
+
+        [FieldOffset(8)]
         protected float[] floats;
 
         [FieldOffset(8)]
@@ -83,13 +86,16 @@ namespace Aletha.bsp
         public ArrayBuffer(byte[] buffer)
         {
             bytes = buffer;
-
-            //buffer = BitConverter.IsLittleEndian ? buffer.Reverse().ToArray() : buffer;
         }
 
         #endregion
 
         #region Implicit Operators
+
+        public static implicit operator double[] (ArrayBuffer buffer)
+        {
+            return buffer.doubles;
+        }
 
         public static implicit operator float[] (ArrayBuffer buffer)
         {
@@ -312,6 +318,33 @@ namespace Aletha.bsp
         public FloatArrayBuffer(float[] buffer) : base(-1)
         {
             base.floats = buffer;
+        }
+    }
+
+    public class DoubleArrayBuffer : ArrayBuffer
+    {
+        public double[] Doubles
+        {
+            get
+            {
+                return base.doubles;
+            }
+            set
+            {
+                base.doubles = value;
+            }
+        }
+
+        public DoubleArrayBuffer(int size) : base(size) { }
+
+        public DoubleArrayBuffer(byte[] buffer) : base(buffer)
+        {
+            bytes = buffer;
+        }
+
+        public DoubleArrayBuffer(double[] buffer) : base(-1)
+        {
+            base.doubles = buffer;
         }
     }
 

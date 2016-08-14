@@ -1,7 +1,7 @@
 using System;
 using OpenTK;
 
-public static class QuaternionExtensions
+public static class QuaternionLib
 {
     public static Vector3 ExtractPitchYawRoll(Quaternion q)
     {
@@ -99,7 +99,7 @@ public static class QuaternionExtensions
     }
     public static Quaternion QuaternionFromEulerAnglesRad(float yaw, float pitch, float roll)
     {
-        var q = new Quaternion(pitch, yaw, roll);
+        var q = new Quaternion( pitch, yaw, roll);
 
         q.Normalize();
         q.Conjugate();

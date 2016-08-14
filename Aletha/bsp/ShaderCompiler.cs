@@ -14,7 +14,7 @@ namespace Aletha
     /// <summary>
     /// q3glshader.js - Transforms a parsed Q3 shader definition into a set of OpenGL compatible states
     /// </summary>
-    public class q3glshader
+    public class ShaderCompiler
     {
         private int white;
         public shader_gl defaultShader;
@@ -24,7 +24,7 @@ namespace Aletha
         private shader_prog_t modelProgram;
         private bool shader_source_tracing = false;
 
-        public q3glshader()
+        public ShaderCompiler()
         {
             white = -1;
             defaultShader = null;
@@ -40,7 +40,7 @@ namespace Aletha
 
         public void init()
         {
-            white = createSolidTexture(new Vector4(255, 255, 255, 255));
+            white = createSolidTexture(new Vector4(255, 255, 255, 0));
             //white = createSolidTexture(gl, [0,0,0,255]);
 
             defaultProgram = compileShaderProgram(Config.q3bsp_default_vertex, Config.q3bsp_default_fragment);
@@ -274,9 +274,9 @@ namespace Aletha
 
         public void loadTexture(shader_gl shader, shader_p surface, stage_gl stage)
         {
-            if (shader.name == "textures/atcs/skybox_s" || shader.sky)
+            if (shader.sky)
             {
-                //var aaa = 1;
+                Console.WriteLine("[skybox] {0}", shader.name);
             }
             if (stage.map == null)
             {
@@ -307,7 +307,7 @@ namespace Aletha
                         stage.animTexture.Add(defaultTexture);
                     }
 
-                    String url = Config.q3bsp_base_folder + "/" + stage.animMaps[i];
+                    string url = Config.q3bsp_base_folder + "/" + stage.animMaps[i];
 
                     loadTextureUrl(stage, url, (int texture) =>
                     {
@@ -643,17 +643,6 @@ namespace Aletha
 
                 shader_prog.uniform[name] = GL.GetUniformLocation(shaderProgram, name);
             }
-
-            //attribCount = GL.getProgramParameter(shaderProgram, RenderingContext.ACTIVE_ATTRIBUTES);
-            //uniformCount = gl.getProgramParameter(shaderProgram, RenderingContext.ACTIVE_UNIFORMS);
-            //shader_prog.uniform = { };
-
-            //for (i = 0; i < uniformCount; i++)
-            //{
-            //    uniform = gl.getActiveUniform(shaderProgram, i);
-
-            //    shader_prog.uniform[uniform.name] = gl.getUniformLocation(shaderProgram, uniform.name);
-            //}
 
             return shader_prog;
         }

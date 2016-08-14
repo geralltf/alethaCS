@@ -127,18 +127,23 @@ namespace Aletha
         {
             this.applyFriction();
 
+            //Vector3 moveDir = camera.Orientation * direction;
+            Vector3 moveDir = QuaternionLib.Rotate(camera.Orientation, direction);
+
+
             float speed = direction.Length * Config.q3movement_scale;
 
-            camera.velocity = this.accelerate(direction, speed, Config.q3movement_accelerate);
+            camera.velocity = this.accelerate(moveDir, speed, Config.q3movement_accelerate);
 
             Vector3 normal = this.groundTrace.plane.normal;
 
             camera.velocity = this.clipVelocity(camera.velocity, normal);
 
-            if (camera.velocity.X == 0 && camera.velocity.Y == 0) { return; }      //if(!this.velocity[0] && !this.velocity[1]) { return; }
+            if (camera.velocity.X == 0 && camera.velocity.Z == 0) { return; }      //if(!this.velocity[0] && !this.velocity[1]) { return; }
 
 
             bool apply_gravity = false;
+
             this.stepSlideMove(apply_gravity);
         }
 
@@ -154,11 +159,13 @@ namespace Aletha
 
             Vector3 down = start_o; // var down = vec3_set(start_o, [0,0,0]);
 
-            down.Z -= Config.q3movement_stepsize;
+            down.Y -= Config.q3movement_stepsize;
 
-            TraceOutput trace = this.bsp.trace(start_o, down, Config.q3movement_playerRadius);
+            TraceOutput trace = this.bsp.trace(start_o, down, camera, Config.q3movement_playerRadius);
 
-            Vector3 up = Vector3.UnitZ;
+            Vector3 up = camera.Up;
+            //up = camera.Up;
+
 
             // never step up when you still have up velocity
             if (camera.velocity.Z > 0 && (trace.fraction == 1.0f || Vector3.Dot(trace.plane.normal, up) < 0.7f))
@@ -173,13 +180,14 @@ namespace Aletha
             up = start_o; // vec3_set(start_o, up);
             up.Z += Config.q3movement_stepsize;
 
+
+
             // test the player position if they were a stepheight higher
-            trace = this.bsp.trace(start_o, up, Config.q3movement_playerRadius);
+            trace = this.bsp.trace(start_o, up, camera, Config.q3movement_playerRadius);
             if (trace.allSolid) { return; } // can't step up
 
             float stepSize = trace.endPos.Z - start_o.Z;
             // try slidemove from this position
-            //trace['endPos'] = vec3_set(this.position);
             camera.applyMovement(trace.endPos); // vec3_set(trace.endPos, this.position);
             camera.velocity = start_v; // vec3_set(start_v, this.velocity);
 
@@ -188,8 +196,12 @@ namespace Aletha
             // push down the final amount
             //this.position = vec3_set(down);
             down = camera.getMovement(); // vec3_set(this.position, down);
+
+
             down.Z -= stepSize;
-            trace = this.bsp.trace(camera.getMovement(), down, Config.q3movement_playerRadius);
+
+
+            trace = this.bsp.trace(camera.getMovement(), down, camera, Config.q3movement_playerRadius);
 
             if (trace.allSolid == false)
             {
@@ -207,7 +219,7 @@ namespace Aletha
             int bumpcount;
             int numbumps = 4;
             //List planes = [];
-            Queue<Vector3> planes = new Queue<Vector3>();
+            List<Vector3> planes = new List<Vector3>();
 
             Vector3 endVelocity = Vector3.Zero;
 
@@ -227,14 +239,14 @@ namespace Aletha
             // never turn against the ground plane
             if (this.groundTrace != null && this.groundTrace.plane != null)
             {
-                planes.Enqueue(this.groundTrace.plane.normal);
+                planes.Add(this.groundTrace.plane.normal);
                 //planes.addLast(this.groundTrace.plane.normal);
             }
 
             // never turn against original velocity
             Vector3 v = new Vector3(camera.velocity);
             v.Normalize();
-            planes.Enqueue(v);
+            planes.Add(v);
             //planes.addLast(v);
 
             float time_left = Config.q3movement_frameTime;
@@ -251,7 +263,7 @@ namespace Aletha
                 end = pos + (camera.velocity * time_left);
 
                 // see if we can make it there
-                TraceOutput trace = this.bsp.trace(pos, end, Config.q3movement_playerRadius);
+                TraceOutput trace = this.bsp.trace(pos, end, camera, Config.q3movement_playerRadius);
 
                 if (trace.allSolid)
                 {
@@ -274,7 +286,7 @@ namespace Aletha
 
                 time_left -= time_left * trace.fraction;
 
-                planes.Enqueue(trace.plane.normal);
+                planes.Add(trace.plane.normal);
                 //planes.addLast(vec3_set(vec3(trace.plane.normal)));
 
                 //
@@ -380,7 +392,7 @@ namespace Aletha
             Vector3 pos = camera.getMovement();
             Vector3 checkPoint = new Vector3(pos.X, pos.Y, pos.Z - Config.q3movement_playerRadius - 0.25f);
 
-            this.groundTrace = this.bsp.trace(pos, checkPoint, Config.q3movement_playerRadius);
+            this.groundTrace = this.bsp.trace(pos, checkPoint, camera, Config.q3movement_playerRadius);
 
             if (this.groundTrace.fraction == 1.0f)
             { // falling
@@ -441,7 +453,6 @@ namespace Aletha
             }
 
             Vector3 accelDir = (dir * accelSpeed);
-
 
             return (camera.velocity + accelDir);
         }

@@ -25,10 +25,11 @@ namespace X3D
         public static float MIN_POSITIVE = (float)5e-324;
         public static float MAX_FINITE = (float)1.7976931348623157e+308;
         public static float Pi = (float)3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844609550582231725359408128481117450284102701938521105559644622948954930382;
-        public static float PiOver2 = Pi / 2.0f;
-        public static float PiOver3 = Pi / 3.0f;
-        public static float PiOver4 = Pi / 4.0f;
-        public static float PiOver6 = Pi / 4.0f;
+        public static float PiOver2 = Pi / 2.0f; // 90 degrees
+        public static float PiOver3 = Pi / 3.0f; // 60 degrees
+        public static float PiOver4 = Pi / 4.0f; // 45 degrees
+        public static float PiOver6 = Pi / 6.0f; // 30 degrees
+        public static float PiOver12 = Pi / 12.0f; // 15 degrees
         public static float HalfPi = 0.5f * Pi;
         public static float ThreePiOver2 = 3 * Pi / 2;
         public static float E = 2.71828182845904523536f;

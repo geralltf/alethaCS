@@ -43,7 +43,7 @@ namespace Aletha.bsp
 				break;
 
 				case "loadShaders":
-				    q3shader.loadList(msg.sources,null);
+				    ShaderParser.loadList(msg.sources,null);
 				break;
 
 				case "trace":

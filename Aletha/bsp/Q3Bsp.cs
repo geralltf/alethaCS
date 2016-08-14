@@ -75,13 +75,13 @@ namespace Aletha.bsp
         public static int startTime;
         public static BgMusic bgMusic;
         public static Timer interval;
-        public static q3glshader glshading;
+        public static ShaderCompiler glshading;
         public static skybox skybox_env;
 
         public q3bsp()
         {
             //map = this;
-            glshading = new q3glshader();
+            glshading = new ShaderCompiler();
 
             //showLoadStatus();
 
@@ -196,7 +196,7 @@ namespace Aletha.bsp
                 urls[i] = Config.q3bsp_base_folder + '/' + urls[i];
             }
 
-            q3shader.loadList(urls, (List<shader_t> shaders) =>
+            ShaderParser.loadList(urls, (List<shader_t> shaders) =>
             {
                 BspOpenglBuilders.buildShaders(shaders);
             });
@@ -255,7 +255,7 @@ namespace Aletha.bsp
                 onsurfaces(surfaces);
             }
 
-            for (var i = 0; i < surfaces.Count; ++i)
+            for (int i = 0; i < surfaces.Count; ++i)
             {
                 surface = surfaces[i];
 
@@ -268,7 +268,10 @@ namespace Aletha.bsp
             }
 
             /* FAST dirty async code */
+            //Timer timer;
+
             ts = new ThreadStart(() =>
+            //timer = new Timer((object state) =>
             {
                 OpenTK.Graphics.IGraphicsContext context;
                 Stack<shader_p> work_items;
@@ -279,11 +282,11 @@ namespace Aletha.bsp
                 work_items = new Stack<shader_p>(unshadedSurfaces);
                 processSurfaces = true;
 
-                while (processSurfaces)//(work_items.Count > 0 && processSurfaces)
-                {
-                    // PROCESS SURFACE SHADERS
-                    // as they come in until there are none left
+                // PROCESS SURFACE SHADERS
+                // as they come in until there are none left
 
+                while (processSurfaces)
+                {
                     if (work_items.Count == 0)
                     {
                         // Have we processed all surfaces?
@@ -296,9 +299,9 @@ namespace Aletha.bsp
                             return order; //(order == 0 ? 1 : order);
                         });
 
-                        //processSurfaces = false;
+                        processSurfaces = false;
                     }
-                    
+
                     {
                         String shader_name;
                         shader_gl shader;
@@ -357,12 +360,13 @@ namespace Aletha.bsp
                         }
 
                     }
-
                 }
 
-
                 Console.WriteLine("Processed surfaces");
+
+            //}, null, 1, 10);
             });
+
 
             th = new Thread(ts);
             th.Start();
@@ -426,13 +430,13 @@ namespace Aletha.bsp
                 // Model shader surfaces (can bind shader once and draw all of them very quickly)
                 if (modelSurfaces.Count > 0)
                 {
-                    render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+                    //render_model_surfaces(leftViewMat, leftProjMat, leftViewport, time);
                 }
 
 
                 //BUG: at the moment with effect surfaces
 
-                render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
+                //render_effect_surfaces(leftViewMat, leftProjMat, leftViewport, time);
             }
 
             //render_models(leftViewMat, leftProjMat, leftViewport, time);
@@ -524,16 +528,16 @@ namespace Aletha.bsp
                     // Draw all geometry that uses this textures
                     GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedInt, surface.indexOffset);
 
-                    ErrorCode result = GL.GetError();
+                    //ErrorCode result = GL.GetError();
 
-                    if (result == ErrorCode.NoError)
-                    {
-                        Console.WriteLine("[effect surfaces]");
-                    }
-                    else
-                    {
-                        Console.WriteLine("[ERROR effect surfaces]");
-                    }
+                    //if (result == ErrorCode.NoError)
+                    //{
+                    //    Console.WriteLine("[effect surfaces]");
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine("[ERROR effect surfaces]");
+                    //}
                 }
             }
         }

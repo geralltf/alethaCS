@@ -1,14 +1,14 @@
 using System;
 using OpenTK;
 
-public class MatrixExtensions
+public class MatrixLib
 {
-    public MatrixExtensions(Matrix4 mat4) { Matrix4 = mat4; }
+    public MatrixLib(Matrix4 mat4) { Matrix4 = mat4; }
     public Matrix4 Matrix4 { get; private set; }
 
-    public static implicit operator MatrixExtensions(Matrix4 mat4)
+    public static implicit operator MatrixLib(Matrix4 mat4)
     {
-        return new MatrixExtensions(mat4);
+        return new MatrixLib(mat4);
     }
 
     //   public static Matrix4 LookAt(Vector3 eye, Vector3 center, Vector3 up) 

@@ -33,7 +33,8 @@ namespace Aletha
 		public static string[] mapShaders = new string[]
 		{
 		 //'scripts/sw_oasis_b3.shader', // Incompatible BSP version. IBSP V.47
-		 "scripts/atcs.shader", 
+		 "scripts/atcs.shader"
+             // ,"scripts/sky.shader"
 		 //'scripts/atcs.arena', // problem loading this
 		 //'scripts/atcs.particle', // problem loading this
 		};

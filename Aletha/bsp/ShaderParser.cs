@@ -12,13 +12,13 @@ namespace Aletha.bsp
     /// <summary>
     /// Shader Loading
     /// </summary>
-    public class q3shader
+    public class ShaderParser
     {
         public static void loadList(String[] urls, OnShadersParsed onload)
         {
             for (var i = 0; i < urls.Length; ++i)
             {
-                q3shader.load(urls[i], onload);
+                ShaderParser.load(urls[i], onload);
             }
         }
 
@@ -29,7 +29,7 @@ namespace Aletha.bsp
             AlethaApplication.incReqests();
             AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
 
-            q3shader.parse(url, responseText, onload);
+            ShaderParser.parse(url, responseText, onload);
 
             //fetch(url, "text/plain").then((request)8
             //{
@@ -48,7 +48,7 @@ namespace Aletha.bsp
             {
                 String name = tokens.next();
 
-                shader_t shader = q3shader.parseShader(name, tokens);
+                shader_t shader = ShaderParser.parseShader(name, tokens);
 
                 if (shader != null)
                 {
@@ -59,7 +59,7 @@ namespace Aletha.bsp
                         for (var i = 0; i < shader.stages.Count; ++i)
                         {
                             // Build a OpenGL shader program out of the stage parameters set here
-                            shader.stages[i].shaderSrc = q3shader.buildShaderSource(shader, shader.stages[i]);
+                            shader.stages[i].shaderSrc = ShaderParser.buildShaderSource(shader, shader.stages[i]);
                         }
                     }
                 }
@@ -95,7 +95,7 @@ namespace Aletha.bsp
                 {
                     case "{":
                         {
-                            stage_t stage = q3shader.parseStage(tokens);
+                            stage_t stage = ShaderParser.parseStage(tokens);
 
                             // I really really really don't like doing this, which basically just forces lightmaps to use the 'filter' blendmode
                             // but if I don't a lot of textures end up looking too bright. I'm sure I'm jsut missing something, and this shouldn't
@@ -142,7 +142,7 @@ namespace Aletha.bsp
                         {
                             case "wave":
                                 deform.spread = 1.0 / double.Parse(tokens.next());
-                                deform.waveform = q3shader.parseWaveform(tokens);
+                                deform.waveform = ShaderParser.parseWaveform(tokens);
                                 break;
                             default: deform = null; break;
                         }
@@ -264,7 +264,7 @@ namespace Aletha.bsp
                         switch (stage.rgbGen)
                         {
                             case "wave":
-                                stage.rgbWaveform = q3shader.parseWaveform(tokens);
+                                stage.rgbWaveform = ShaderParser.parseWaveform(tokens);
                                 if (stage.rgbWaveform == null) { stage.rgbGen = "identity"; }
                                 break;
                         };
@@ -275,7 +275,7 @@ namespace Aletha.bsp
                         switch (stage.alphaGen)
                         {
                             case "wave":
-                                stage.alphaWaveform = q3shader.parseWaveform(tokens);
+                                stage.alphaWaveform = ShaderParser.parseWaveform(tokens);
                                 if (stage.alphaWaveform == null) { stage.alphaGen = "1.0"; }
                                 break;
                             default: break;
@@ -343,7 +343,7 @@ namespace Aletha.bsp
                                 tcMod.tSpeed = double.Parse(tokens.next());
                                 break;
                             case "stretch":
-                                tcMod.waveform = q3shader.parseWaveform(tokens);
+                                tcMod.waveform = ShaderParser.parseWaveform(tokens);
                                 if (tcMod.waveform == null) { tcMod.type = null; }
                                 break;
                             case "turb":
@@ -399,8 +399,8 @@ namespace Aletha.bsp
         public static shader_src_t buildShaderSource(shader_t shader, stage_t stage)
         {
             shader_src_t src = new shader_src_t();
-            src.vertex = q3shader.buildVertexShader(shader, stage);
-            src.fragment = q3shader.buildFragmentShader(shader, stage);
+            src.vertex = ShaderParser.buildVertexShader(shader, stage);
+            src.fragment = ShaderParser.buildFragmentShader(shader, stage);
             return src;
         }
 

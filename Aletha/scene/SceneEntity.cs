@@ -64,7 +64,7 @@ namespace X3D.Engine
 			this.Orientation = this.yaw * this.pitch  /* this.roll */ ;
 			this.Orientation.Normalize();
 
-			this.Direction = QuaternionExtensions.Rotate(Orientation, Right);
+			this.Direction = QuaternionLib.Rotate(Orientation, Right);
 		}
 
 		//public Matrix4 lookAt(Vector3 eye, Vector3 center, Vector3 up) 

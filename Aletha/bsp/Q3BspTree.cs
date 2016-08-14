@@ -1,7 +1,6 @@
 using System;
 using OpenTK;
-
-
+using X3D.Engine;
 
 namespace Aletha.bsp
 {
@@ -21,7 +20,7 @@ namespace Aletha.bsp
             this.bsp = bsp_data;
         }
 
-        public TraceOutput trace(Vector3 start, Vector3 end, float radius = 0.0f)
+        public TraceOutput trace(Vector3 start, Vector3 end, SceneCamera camera, float radius = 0.0f)
         {
             TraceOutput output = new TraceOutput()
             {
@@ -37,22 +36,20 @@ namespace Aletha.bsp
                 return output;
             }
 
-            output = this.traceNode(0, 0.0f, 1.0f, start, end, radius, output);
+            output = this.traceNode(0, 0.0f, 1.0f, start, end, radius, output, camera);
 
             if (output.fraction != 1.0f)
             {
                 // collided with something
 
-                output.endPos.X = start.X + output.fraction * (end.X - start.X);
-                output.endPos.Y = start.Y + output.fraction * (end.Y - start.Y);
-                output.endPos.Z = start.Z + output.fraction * (end.Z - start.Z);
+                output.endPos = start + output.fraction * (end - start); // interpolate to determine the end position
             }
 
             return output;
         }
 
         public TraceOutput traceNode(long nodeIdx, float startFraction, float endFraction,
-             Vector3 start, Vector3 end, float radius, TraceOutput output)
+             Vector3 start, Vector3 end, float radius, TraceOutput output, SceneCamera camera)
         {
             if (nodeIdx < 0) // Leaf node? 
             {
@@ -79,11 +76,11 @@ namespace Aletha.bsp
 
             if (startDist >= radius && endDist >= radius)
             {
-                output = this.traceNode(node.children[0], startFraction, endFraction, start, end, radius, output);
+                output = this.traceNode(node.children[0], startFraction, endFraction, start, end, radius, output, camera);
             }
             else if (startDist < -radius && endDist < -radius)
             {
-                output = this.traceNode(node.children[1], startFraction, endFraction, start, end, radius, output);
+                output = this.traceNode(node.children[1], startFraction, endFraction, start, end, radius, output, camera);
             }
             else
             {
@@ -131,7 +128,7 @@ namespace Aletha.bsp
                 //    middle[i] = start[i] + fraction1 * (end[i] - start[i]);
                 //}
 
-                output = this.traceNode(node.children[side], startFraction, middleFraction, start, middle, radius, output);
+                output = this.traceNode(node.children[side], startFraction, middleFraction, start, middle, radius, output, camera);
 
                 middleFraction = startFraction + (endFraction - startFraction) * fraction2;
 
@@ -143,7 +140,7 @@ namespace Aletha.bsp
                 //    middle[i] = start[i] + fraction2 * (end[i] - start[i]);
                 //}
 
-                output = this.traceNode(node.children[side == 0 ? 1 : 0], middleFraction, endFraction, middle, end, radius, output);
+                output = this.traceNode(node.children[side == 0 ? 1 : 0], middleFraction, endFraction, middle, end, radius, output, camera);
             }
 
             return output;

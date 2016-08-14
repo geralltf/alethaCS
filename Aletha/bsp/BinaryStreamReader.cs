@@ -108,7 +108,7 @@ namespace Aletha.bsp
 
             Int32ArrayBuffer bf_wia = new Int32ArrayBuffer(tmp);
 
-            value = bf_wia.Ints[0]; // implicit typecast combining 4 bytes into long
+            value = bf_wia.Ints[0]; // implicit typecast combining 4 bytes into integer
 
             this.offset += sizeof(int);
 
@@ -124,7 +124,7 @@ namespace Aletha.bsp
 
             value = (sbyte)((int)data[this.offset] & 0xff);
 
-            value= (sbyte)((int)value - ((int)value & 0x80)); // signed
+            value= (sbyte)((int)value - ((int)value & 0x80)); // pick a byte and ensure it is a signed byte value
 
             this.offset += sizeof(sbyte);
 
@@ -138,9 +138,9 @@ namespace Aletha.bsp
         {
             byte value;
 
-            value = (byte)(data[this.offset] & 0xff);
+            value = (byte)(data[this.offset] & 0xff); 
 
-            stream.Position = (long)offset;
+            stream.Position = (long)offset; // pick a byte and ensure it is leaved as an unsigned byte value
 
             this.offset += sizeof(byte);
 
@@ -160,7 +160,7 @@ namespace Aletha.bsp
 
             Int16ArrayBuffer bf_wia = new Int16ArrayBuffer(tmp);
 
-            value = bf_wia.Shorts[0]; // implicit typecast combining 4 bytes into long
+            value = bf_wia.Shorts[0]; // implicit typecast combining 4 bytes into short
 
             this.offset += sizeof(short);
 
@@ -180,7 +180,7 @@ namespace Aletha.bsp
 
             UInt16ArrayBuffer bf_wia = new UInt16ArrayBuffer(tmp);
 
-            value = bf_wia.Shorts[0]; // implicit typecast combining 4 bytes into long
+            value = bf_wia.Shorts[0]; // implicit typecast combining 4 bytes into short
 
             this.offset += sizeof(ushort);
 
@@ -202,7 +202,7 @@ namespace Aletha.bsp
 
             Int64ArrayBuffer bf_wia = new Int64ArrayBuffer(tmp);
 
-            value = bf_wia.Longs[0]; // implicit typecast combining 4 bytes into integer
+            value = bf_wia.Longs[0]; // implicit typecast combining 4 bytes into long
 
             this.offset += sizeof(Int64);
 
@@ -222,7 +222,7 @@ namespace Aletha.bsp
 
             UInt64ArrayBuffer bf_wia = new UInt64ArrayBuffer(tmp);
 
-            value = bf_wia.Longs[0]; // implicit typecast combining 4 bytes into integer
+            value = bf_wia.Longs[0]; // implicit typecast combining 4 bytes into long
 
             this.offset += sizeof(ulong);
 
@@ -245,11 +245,6 @@ namespace Aletha.bsp
 
             Array.Copy(this.data, (int)this.offset, tmp, 0, tmp.Length);
 
-            //tmp[0] = ((byte)(tmp[0] & (byte)0xff));
-            //tmp[1] = ((byte)(tmp[1] & (byte)0xff));
-            //tmp[2] = ((byte)(tmp[2] & (byte)0xff));
-            //tmp[3] = ((byte)(tmp[3] & (byte)0xff));
-
             bf_wfa = new FloatArrayBuffer(tmp);
 
             value = bf_wfa.Floats[0]; // implicit typecast combining 4 bytes into float
@@ -259,6 +254,30 @@ namespace Aletha.bsp
             return value;
         }
 
+        /// <summary>
+        /// Read a float (4 bytes) from the stream
+        /// </summary>
+        public double ReadDouble()
+        {
+            double value;
+            FloatArrayBuffer bf_wfa;
+            byte[] tmp;
+            int offset_double;
+
+            offset_double = sizeof(double);
+
+            tmp = new byte[offset_double];
+
+            Array.Copy(this.data, (int)this.offset, tmp, 0, tmp.Length);
+
+            bf_wfa = new FloatArrayBuffer(tmp);
+
+            value = bf_wfa.Floats[0]; // implicit typecast combining 8 bytes into double
+
+            this.offset += (ulong)offset_double;
+
+            return value;
+        }
 
         public int ExpandHalf(ushort h)
         {
