@@ -536,7 +536,7 @@ namespace X3D.Engine
             camera_pitch = OriginRotation.Z;// * MathHelpers.PiOver180;
             camera_yaw = OriginRotation.X;// * MathHelpers.PiOver180;
 
-            Orientation = QuaternionLib.QuaternionFromEulerAnglesRad(0, camera_yaw, camera_pitch);
+            Orientation = QuaternionLib.QuaternionFromEulerAnglesRad(0, -camera_yaw, -camera_pitch);
             //Orientation = QuaternionExtensions.EulerToQuat(0, camera_yaw, -camera_pitch);
         }
     }

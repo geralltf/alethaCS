@@ -148,7 +148,7 @@ namespace Aletha
                 xAngle = 0.0f;
 
                 xAngle = (xAngle / 360f) * MathHelper.TwoPi ;
-                zAngle = (zAngle / 360f) * MathHelper.TwoPi; // + MathHelper.Pi + MathHelper.PiOver4;
+                zAngle = (zAngle / 360f) * MathHelper.TwoPi + MathHelper.PiOver2 + MathHelper.PiOver4;
 
                 Vector3 rotation = new Vector3(xAngle, 0.0f, zAngle);
 
