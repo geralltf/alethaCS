@@ -353,19 +353,19 @@ namespace X3D.Engine
 
         public void Walk(float magnitude)
         {
-            Vector3 lookat = QuaternionLib.Rotate(Orientation, Vector3.UnitY);
+            Vector3 lookat = QuaternionLib.Rotate(Orientation, Vector3.UnitZ);
 
-            Position += lookat * magnitude;
+            Position += lookat * (-magnitude);
         }
 
         public void Strafe(float magnitude)
         {
-            Vector3 lookat = QuaternionLib.Rotate(Orientation, Vector3.UnitY);
-            Vector3 forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+            Vector3 lookat = QuaternionLib.Rotate(Orientation, Vector3.UnitZ);
+            Vector3 forward = new Vector3(lookat.X, lookat.Y, 0).Normalized();
             Vector3 up = Vector3.UnitZ;
             Vector3 left = up.Cross(forward);
 
-            Position += left * magnitude;
+            Position += left * (-magnitude);
         }
 
         public void Fly(float units)

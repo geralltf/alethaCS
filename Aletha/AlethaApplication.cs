@@ -40,6 +40,8 @@ namespace Aletha
         public static float playerDirectionMagnitude = 1.0f;
         public static float movementSpeed = 1.0f;
 
+        public NavigationType navigationType = NavigationType.Walk;
+
         public static int request_number = 0;
 
         public static SceneCamera camera;
@@ -225,7 +227,7 @@ namespace Aletha
             //map.onsurfaces = initSurfaces;
             q3bsp.loadShaders(Config.mapShaders);
 
-            BspCompiler.load(Config.map_uri, tess_level, null);
+            BspCompiler.Load(Config.map_uri, tess_level, null);
         }
 
         private void OnMapLoaded (string map)
@@ -445,65 +447,71 @@ namespace Aletha
             Vector3 left = up.Cross(forward);
             Vector3 right = up.Cross(camera.Direction);
 
-            if (Keyboard[Key.W])
+            if(navigationType == NavigationType.Walk)
             {
-                //direction += camera.Direction * Config.playerDirectionMagnitude;
-                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-                direction -= camera.Forward * Config.playerDirectionMagnitude;
+                if (Keyboard[Key.W])
+                {
+                    //direction += camera.Direction * Config.playerDirectionMagnitude;
+                    camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                    direction -= camera.Forward * Config.playerDirectionMagnitude;
 
-                translated = true;
+                    translated = true;
+                }
+                if (Keyboard[Key.S])
+                {
+                    camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                    direction += camera.Forward * Config.playerDirectionMagnitude;
+
+                    //direction -= camera.Direction * Config.playerDirectionMagnitude;
+                    translated = true;
+                }
+                if (Keyboard[Key.A])
+                {
+                    camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                    camera.Right = right;
+
+                    direction += camera.Right * Config.playerDirectionMagnitude;
+                    translated = true;
+                }
+                if (Keyboard[Key.D])
+                {
+                    camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                    camera.Right = right;
+
+                    direction -= camera.Right * Config.playerDirectionMagnitude;
+                    translated = true;
+                }
             }
-            if (Keyboard[Key.S])
+            else if (navigationType == NavigationType.Fly)
             {
-                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-                direction += camera.Forward * Config.playerDirectionMagnitude;
+                if (Keyboard[Key.T])
+                {
+                    camera.Fly(playerDirectionMagnitude * movementSpeed);
+                }
+                if (Keyboard[Key.G])
+                {
+                    camera.Fly(-playerDirectionMagnitude * movementSpeed);
+                }
 
-                //direction -= camera.Direction * Config.playerDirectionMagnitude;
-                translated = true;
-            }
-            if (Keyboard[Key.A])
-            {
-                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-                camera.Right = right;
-
-                direction += camera.Right * Config.playerDirectionMagnitude;
-                translated = true;
-            }
-            if (Keyboard[Key.D])
-            {
-                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-                camera.Right = right;
-
-                direction -= camera.Right * Config.playerDirectionMagnitude;
-                translated = true;
-            }
-
-
-            if (Keyboard[Key.T])
-            {
-                camera.Fly(playerDirectionMagnitude * movementSpeed);
-            }
-            if (Keyboard[Key.G])
-            {
-                camera.Fly(-playerDirectionMagnitude * movementSpeed);
+                if (Keyboard[Key.W])
+                {
+                    camera.Walk(playerDirectionMagnitude * movementSpeed);
+                }
+                if (Keyboard[Key.S])
+                {
+                    camera.Walk(-playerDirectionMagnitude * movementSpeed);
+                }
+                if (Keyboard[Key.A])
+                {
+                    camera.Strafe(playerDirectionMagnitude * movementSpeed);
+                }
+                if (Keyboard[Key.D])
+                {
+                    camera.Strafe(-playerDirectionMagnitude * movementSpeed);
+                }
             }
 
-            //if (Keyboard[Key.W])
-            //{
-            //    camera.Walk(playerDirectionMagnitude * movementSpeed);
-            //}
-            //if (Keyboard[Key.S])
-            //{
-            //    camera.Walk(-playerDirectionMagnitude * movementSpeed);
-            //}
-            //if (Keyboard[Key.A])
-            //{
-            //    camera.Strafe(playerDirectionMagnitude * movementSpeed);
-            //}
-            //if (Keyboard[Key.D])
-            //{
-            //    camera.Strafe(-playerDirectionMagnitude * movementSpeed);
-            //}
+
 
             if (Keyboard[Key.PageUp])
             {
@@ -595,13 +603,11 @@ namespace Aletha
                 camera.ApplyRotation();
             }
 
-            //if (translated)
-            //{
+            if (navigationType == NavigationType.Walk)
+            {
                 camera.move(direction, frameTime);
-            //}
+            }
 
-
-            //playerMover.move(vec3(direction),frameTime);
 
             //camera.update(frameTime);
         }
