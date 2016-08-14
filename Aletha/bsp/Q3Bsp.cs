@@ -29,7 +29,7 @@ namespace Aletha.bsp
                 if (type == "worker")
                 {
                     q3bsp.onMessage(replay);
-                    BspCompiler._onmessage(replay);
+                    BspCompiler.OnMessage(replay);
 
                     return;
                 }
@@ -46,7 +46,7 @@ namespace Aletha.bsp
             }
 
 
-            BspCompiler._onmessage(@params);
+            BspCompiler.OnMessage(@params);
             q3bsp.onMessage(@params);
 
             Console.WriteLine("Please wait");
@@ -274,12 +274,12 @@ namespace Aletha.bsp
             //timer = new Timer((object state) =>
             {
                 OpenTK.Graphics.IGraphicsContext context;
-                Stack<shader_p> work_items;
+                //Stack<shader_p> work_items;
                 bool processSurfaces;
 
                 context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
                 context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
-                work_items = new Stack<shader_p>(unshadedSurfaces);
+                //work_items = new Stack<shader_p>(unshadedSurfaces);
                 processSurfaces = true;
 
                 // PROCESS SURFACE SHADERS
@@ -287,7 +287,7 @@ namespace Aletha.bsp
 
                 while (processSurfaces)
                 {
-                    if (work_items.Count == 0)
+                    if (unshadedSurfaces.Count == 0)
                     {
                         // Have we processed all surfaces?
                         // Sort to ensure correct order of transparent objects
@@ -307,10 +307,10 @@ namespace Aletha.bsp
                         shader_gl shader;
 
 
-                        if (work_items.Count != 0)
+                        if (unshadedSurfaces.Count != 0)
                         {
-                            surface = work_items.Pop();
-                            unshadedSurfaces.RemoveAt(0);
+                            surface = unshadedSurfaces.Last();
+                            unshadedSurfaces.RemoveAt(unshadedSurfaces.Count-1);
 
                             //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
 
@@ -452,6 +452,8 @@ namespace Aletha.bsp
 
         public static void render_default_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
+            int i;
+
             // Map Geometry buffers
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
@@ -466,15 +468,13 @@ namespace Aletha.bsp
                 shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
 
 
-                BspOpenglBinders.bindShaderAttribs(shaderProgram);
+                BspOpenglBinders.BindShaderAttribs(shaderProgram);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, glshading.defaultTexture);
 
-                BspOpenglBinders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+                BspOpenglBinders.BindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
                 setViewport(leftViewport);
-
-                int i;
 
                 for (i = 0; i < unshadedSurfaces.Count; ++i)
                 {
@@ -520,8 +520,8 @@ namespace Aletha.bsp
 
                     if (shaderProgram == null) { continue; }
 
-                    BspOpenglBinders.bindShaderAttribs(shaderProgram);
-                    BspOpenglBinders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+                    BspOpenglBinders.BindShaderAttribs(shaderProgram);
+                    BspOpenglBinders.BindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
 
                     setViewport(leftViewport);
 
@@ -548,10 +548,10 @@ namespace Aletha.bsp
             glshading.setShader(shader);
             stage_gl stage = shader.stages[0];
             shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
-            BspOpenglBinders.bindShaderAttribs(shaderProgram);
+            BspOpenglBinders.BindShaderAttribs(shaderProgram);
             GL.ActiveTexture(TextureUnit.Texture0);
 
-            BspOpenglBinders.bindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
+            BspOpenglBinders.BindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
             setViewport(leftViewport);
 
             for (int i = 0; i < modelSurfaces.Count; ++i)

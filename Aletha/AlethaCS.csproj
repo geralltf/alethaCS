@@ -57,6 +57,7 @@
     <Compile Include="bsp\ShaderTokenizer.cs" />
     <Compile Include="bsp\Skybox.cs" />
     <Compile Include="bsp\texture.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="math\MathHelpers.cs" />
     <Compile Include="math\QuaternionLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

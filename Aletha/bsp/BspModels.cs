@@ -52,28 +52,6 @@ namespace Aletha.bsp
         public Dictionary<string, object> Fields = new Dictionary<string, object>();
     }
 
-    //class trace_output
-    //    {
-    //        bool allSolid;
-    //        bool startSolid;
-    //        double fraction;
-    //        Vector3 endPos;
-    //        Plane plane;
-    //    }
-    //    class Plane
-    //    {
-    //        Vector3 normal;
-    //        double distance;
-    //    }
-
-    //public class Entity
-    //{
-    //    public string classname;
-    //    public string targetname;
-    //    public float? angle;
-    //    public Vector3 origin;
-    //}
-
     public class bsp_tree
     {
         public List<Plane> planes;

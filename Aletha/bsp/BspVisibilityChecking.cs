@@ -11,6 +11,8 @@ namespace Aletha.bsp
     /// </summary>
     public class BspVisibilityChecking
     {
+        public static byte[] visBuffer;
+        public static long visSize;
 
         private static bool checkVis(long visCluster, long testCluster)
         {
@@ -19,8 +21,8 @@ namespace Aletha.bsp
                 return true;
             }
 
-            var i = (visCluster * BspCompiler.visSize) + (testCluster >> 3);
-            byte visSet = BspCompiler.visBuffer[i];
+            var i = (visCluster * visSize) + (testCluster >> 3);
+            byte visSet = visBuffer[i];
 
             return ((visSet > 0) & (1 << ((int)testCluster & 7)) != 0);
         }
@@ -81,11 +83,11 @@ namespace Aletha.bsp
                 }
             }
 
-            byte[] ar = new byte[BspCompiler.visSize];
+            byte[] ar = new byte[BspVisibilityChecking.visSize];
 
-            for (int i = 0; i < BspCompiler.visSize; ++i)
+            for (int i = 0; i < BspVisibilityChecking.visSize; ++i)
             {
-                ar[i] = BspCompiler.visBuffer[(curLeaf.cluster * BspCompiler.visSize) + i];
+                ar[i] = BspVisibilityChecking.visBuffer[(curLeaf.cluster * BspVisibilityChecking.visSize) + i];
             }
 
             q3bsp.postMessage2( new MessageParams(){

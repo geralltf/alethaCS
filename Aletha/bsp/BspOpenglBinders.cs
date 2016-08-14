@@ -5,6 +5,7 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using X3D;
+using X3D.Engine;
 
 namespace Aletha.bsp
 {
@@ -13,26 +14,28 @@ namespace Aletha.bsp
     {
         // Draw the map
 
-        public static void bindShaderMatrix(shader_prog_t shader, Matrix4 modelViewMat, Matrix4 projectionMat)
+        public static void BindShaderMatrix(shader_prog_t shader, Matrix4 modelViewMat, Matrix4 perspective)
         {
-            Matrix4 model = Matrix4.Identity;
-            var cam = AlethaApplication.camera;
+            Matrix4 model;
+            SceneCamera cam;
+            Matrix4 cameraTransl;
+            Matrix4 cameraRot;
+            Matrix4 MV;
 
-            Matrix4 cameraTransl = Matrix4.CreateTranslation(-cam.Position - new Vector3(0, 0, Config.playerHeight));
-            Quaternion q = cam.Orientation;
+            model = Matrix4.Identity;
+            cam = AlethaApplication.camera;
 
-            Matrix4 cameraRot = Matrix4.CreateFromQuaternion(q); // cameraRot = MathHelpers.CreateRotation(ref q);
+            cameraTransl = Matrix4.CreateTranslation(-cam.Position - new Vector3(0, 0, Config.playerHeight));
 
+            cameraRot = Matrix4.CreateFromQuaternion(cam.Orientation);
 
-            
-            Matrix4 MVP = ((model) * cameraTransl) * cameraRot;
+            MV = (model * cameraTransl) * cameraRot;
 
-
-            GL.UniformMatrix4(shader.uniform["modelViewMat"], false, ref MVP);
-            GL.UniformMatrix4(shader.uniform["projectionMat"], false, ref projectionMat);
+            GL.UniformMatrix4(shader.uniform["modelViewMat"], false, ref MV);
+            GL.UniformMatrix4(shader.uniform["projectionMat"], false, ref perspective);
         }
 
-        public static void bindShaderAttribs(shader_prog_t shader)
+        public static void BindShaderAttribs(shader_prog_t shader)
         {
 
             // Setup vertex attributes

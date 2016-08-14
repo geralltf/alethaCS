@@ -12,8 +12,6 @@ namespace Aletha.bsp
 	{
 		public static int lastLeaf = -1;
 
-        // note: IBSP iD3 spec http://www.mralligator.com/q3/#Entities
-
         public static List<Leaf> leaves;
         public static List<Plane> planes;
         public static List<bsp_tree_node> nodes;
@@ -21,13 +19,11 @@ namespace Aletha.bsp
         public static List<Brush> brushes;
         public static List<BrushSide> brushSides;
         public static List<long> leafFaces, leafBrushes;
-        public static byte[] visBuffer;
-        public static long visSize;
         public static List<shader_p> shaders; // This needs to be kept here for collision detection (indicates non-solid surfaces)
 
 
 
-		public static void _onmessage(MessageParams msg) 
+		public static void OnMessage(MessageParams msg) 
 		{  
 			switch(msg.type) 
 			{
@@ -35,10 +31,10 @@ namespace Aletha.bsp
 				    String url = msg.url;
 				    int tessLevel = msg.tesselationLevel;
 
-                    BspCompiler.load(url, tessLevel, () => {
+                    BspCompiler.Load(url, tessLevel, () => {
                         // Fallback to account for Opera handling URLs in a worker 
                         // differently than other browsers. 
-                        BspCompiler.load("../" + url, tessLevel,null);
+                        BspCompiler.Load("../" + url, tessLevel,null);
 				    });
 				break;
 
@@ -60,17 +56,7 @@ namespace Aletha.bsp
 			}
 		}
 
-        public static void init(){
-
-			//    context["onq3message"] = (params) {
-			//       //call any dart method
-			//      onmessage(params);
-			//      
-			//      q3bsp.onMessage(params);
-			//    };
-		}
-
-		public static void load (string mapURL, int tesselationLevel, OnLoadError errorCallback)
+		public static void Load (string mapURL, int tesselationLevel, OnLoadError errorCallback)
 		{
             byte[] data;
             MemoryStream ms;
@@ -97,7 +83,7 @@ namespace Aletha.bsp
             });
 
 
-            bsp_parser_ibsp_v46.parse(new BinaryStreamReader(ms), tesselationLevel, (bsp_header_t header) => {
+            bsp_parser_ibsp_v46.Parse(new BinaryStreamReader(ms), tesselationLevel, (bsp_header_t header) => {
 
                 q3bsp.onMessage(new MessageParams()
                 {
@@ -106,35 +92,12 @@ namespace Aletha.bsp
                 });
                 
             });
-
-
-
-            //fetch(mapURL, 'arraybuffer').then((request)
-            //                                  {
-            //	if(request.response is ByteBuffer)
-            //	{
-            //		postMessage2({
-            //			"type": 'status',
-            //			"message": 'Map downloaded, parsing level geometry...'
-            //		},null);
-
-            //		bsp_parser_ibsp_v46.parse(new binary_stream(request.response), tesselationLevel, (bsp_header_t header) {
-            //			postMessage2({
-            //				"type": 'status',
-            //				"message": 'Incompatible BSP version. '+ header.company + ' ' + header.tag + ' V.' + header.version.toString()
-            //			},null);
-            //		});
-
-            //		// TODO: could potentially hit compileMap now instead of within parse
-            //	}
-            //});
         }
 
-        //
-        // Compile the map into a stream of OpenGL-compatible data
-        //
-
-        public static void compileMap   ( List<Vertex> verts, 
+        /// <summary>
+        /// Compile the map into a stream of OpenGL-compatible data
+        /// </summary>
+        public static void CompileMap   ( List<Vertex> verts, 
 		                     List<Face> faces, 
 		                     List<int> meshVerts, 
 		                     List<lightmap_rect_t> lightmaps, 
@@ -203,16 +166,13 @@ namespace Aletha.bsp
 				}
 			}
 
-            // needs to be Float32List
             // Compile vert list INTERLEAVE
-            //var vertices = new Array(verts.length*14);
             float[] vertices;
 
-            vertices = interleave(verts);
+            vertices = Interleave(verts);
 
 
             // Compile index list
-            //Uint16List indices = new Uint16List(0);
             List<ushort> lst_indices = new List<ushort>();
 
 			for(int i = 0; i <  shaders.Count; ++i) 
@@ -240,9 +200,6 @@ namespace Aletha.bsp
 
             ushort[] indices = lst_indices.ToArray();
 
-            //         indices = new Uint16List(lst_indices.length);
-            //indices.setAll(0,lst_indices);
-
 
             // Send the compiled vertex/index data back to the render thread
             q3bsp.onMessage( new MessageParams()
@@ -255,7 +212,10 @@ namespace Aletha.bsp
             });
         }
 
-        private static float[] interleave(List<Vertex> verticies)
+        /// <summary>
+        /// Interleave the vertices into a float array
+        /// </summary>
+        private static float[] Interleave(List<Vertex> verticies)
         {
             Vertex vert;
             float[] vertices;

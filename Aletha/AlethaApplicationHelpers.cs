@@ -6,13 +6,31 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL4;
 using g = OpenTK.Graphics;
-
+using System.Runtime.InteropServices;
 
 namespace Aletha
 {
     public partial class AlethaApplication
     {
         bool isFullscreen;
+        private static bool systemCursorVisible = true;
+        private int navType = (int)NavigationType.Walk;
+
+        [DllImport("user32.dll")]
+        private static extern int ShowCursor(bool bShow);
+
+        public void ToggleCursor()
+        {
+            if (systemCursorVisible)
+            {
+                ShowCursor(false);
+            }
+            else
+            {
+                ShowCursor(true);
+            }
+            systemCursorVisible = !systemCursorVisible;
+        }
 
         private void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
         {
@@ -49,6 +67,12 @@ namespace Aletha
 
                 isFullscreen = !isFullscreen;
 
+                ToggleCursor();
+            }
+            if (e.Key == Key.F1)
+            {
+                navType = (navType + 1) % (int)NavigationType._LastType;
+                navigationType = (NavigationType)navType;
             }
             if (e.Key == Key.C)
             {

@@ -9,17 +9,16 @@ namespace Aletha.bsp
 {
     public delegate void OnBspIncompatible(bsp_header_t header);
 
+    // note: IBSP iD3 spec http://www.mralligator.com/q3/#Entities
+
     public class bsp_parser_ibsp_v46
     {
         /// <summary>
         /// Parses the BSP file
         /// </summary>
-        /// <param name="src"></param>
-        /// <param name="tesselationLevel"></param>
-        /// <param name="onIncompatible"></param>
-        public static void parse(BinaryStreamReader src, int tesselationLevel, OnBspIncompatible onIncompatible)
+        public static void Parse(BinaryStreamReader src, int tesselationLevel, OnBspIncompatible onIncompatible)
         {
-            bsp_header_t header = readHeader(src);
+            bsp_header_t header = ReadHeader(src);
 
             // Check for appropriate format
             if (header.tag != "IBSP" || header.version != 46)
@@ -53,7 +52,7 @@ namespace Aletha.bsp
 
 
             // Read map entities
-            bsp_parser_ibsp_v46.readEntities(header.lumps[0], src);
+            bsp_parser_ibsp_v46.ReadEntities(header.lumps[0], src);
             /*  The entities lump stores game-related map information, 
              *  including information about the map name, weapons, health, armor, triggers, spawn points, 
              *  lights, and .md3 models to be placed in the map. 
@@ -63,16 +62,16 @@ namespace Aletha.bsp
             List<shader_p> shaders;
 
             // Load visual map components
-            tree.surfaces = shaders = bsp_parser_ibsp_v46.readShaders(header.lumps[1], src);
-            List<lightmap_rect_t> lightmaps = bsp_parser_ibsp_v46.readLightmaps(header.lumps[14], src);
-            List<Vertex> verts = bsp_parser_ibsp_v46.readVerts(header.lumps[10], src);
-            List<int> meshVerts = bsp_parser_ibsp_v46.readMeshVerts(header.lumps[11], src);
-            List<Face> faces = bsp_parser_ibsp_v46.readFaces(header.lumps[13], src);
+            tree.surfaces = shaders = bsp_parser_ibsp_v46.ReadShaders(header.lumps[1], src);
+            List<lightmap_rect_t> lightmaps = bsp_parser_ibsp_v46.ReadLightmaps(header.lumps[14], src);
+            List<Vertex> verts = bsp_parser_ibsp_v46.ReadVerts(header.lumps[10], src);
+            List<int> meshVerts = bsp_parser_ibsp_v46.ReadMeshVerts(header.lumps[11], src);
+            List<Face> faces = bsp_parser_ibsp_v46.ReadFaces(header.lumps[13], src);
 
             
 
             // COMPILE MAP
-            BspCompiler.compileMap(verts, faces, meshVerts, lightmaps, shaders, tesselationLevel);
+            BspCompiler.CompileMap(verts, faces, meshVerts, lightmaps, shaders, tesselationLevel);
 
          //   postMessage2({
          //       "type": 'status',
@@ -81,19 +80,19 @@ namespace Aletha.bsp
 
 
             // Load bsp components
-            tree.planes = bsp_parser_ibsp_v46.readPlanes(header.lumps[2], src);
-            tree.nodes = bsp_parser_ibsp_v46.readNodes(header.lumps[3], src);
-            tree.leaves = bsp_parser_ibsp_v46.readLeaves(header.lumps[4], src);
-            tree.leafFaces = bsp_parser_ibsp_v46.readLeafFaces(header.lumps[5], src);
-            tree.leafBrushes = bsp_parser_ibsp_v46.readLeafBrushes(header.lumps[6], src);
-            tree.brushes = bsp_parser_ibsp_v46.readBrushes(header.lumps[8], src);
-            tree.brushSides = bsp_parser_ibsp_v46.readBrushSides(header.lumps[9], src);
-            VisData visData = bsp_parser_ibsp_v46.readVisData(header.lumps[16], src);
+            tree.planes = bsp_parser_ibsp_v46.ReadPlanes(header.lumps[2], src);
+            tree.nodes = bsp_parser_ibsp_v46.ReadNodes(header.lumps[3], src);
+            tree.leaves = bsp_parser_ibsp_v46.ReadLeaves(header.lumps[4], src);
+            tree.leafFaces = bsp_parser_ibsp_v46.ReadLeafFaces(header.lumps[5], src);
+            tree.leafBrushes = bsp_parser_ibsp_v46.ReadLeafBrushes(header.lumps[6], src);
+            tree.brushes = bsp_parser_ibsp_v46.ReadBrushes(header.lumps[8], src);
+            tree.brushSides = bsp_parser_ibsp_v46.ReadBrushSides(header.lumps[9], src);
+            VisData visData = bsp_parser_ibsp_v46.ReadVisData(header.lumps[16], src);
             tree.visBuffer = visData.buffer;
             tree.visSize = visData.size;
 
-            BspCompiler.visBuffer = visData.buffer;
-            BspCompiler.visSize = visData.size;
+            BspVisibilityChecking.visBuffer = visData.buffer;
+            BspVisibilityChecking.visSize = visData.size;
 
             //tree.visData = visData;
 
@@ -107,7 +106,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all lump headers
         /// </summary>
-        private static bsp_header_t readHeader(BinaryStreamReader src)
+        private static bsp_header_t ReadHeader(BinaryStreamReader src)
         {
             bsp_header_lump_t lump;
             bsp_header_t header;
@@ -157,7 +156,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all entity structures
         /// </summary>
-        private static void readEntities(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static void ReadEntities(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             string entities;
             List<Q3Entity> elements;
@@ -330,7 +329,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all shader structures
         /// </summary>
-        private static List<shader_p> readShaders(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<shader_p> ReadShaders(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 72;
             List<shader_p> elements = new List<shader_p>();
@@ -360,7 +359,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all lightmaps
         /// </summary>
-        private static List<lightmap_rect_t> readLightmaps(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<lightmap_rect_t> ReadLightmaps(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int lightmapSize = 128 * 128;
             int count = (int)lump.length / (lightmapSize * 3);
@@ -437,7 +436,7 @@ namespace Aletha.bsp
 
 
 
-        private static List<Vertex> readVerts(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<Vertex> ReadVerts(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 44;
             List<Vertex> elements = new List<Vertex>();
@@ -460,7 +459,7 @@ namespace Aletha.bsp
             return elements;
         }
 
-        private static List<int> readMeshVerts(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<int> ReadMeshVerts(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 4;
             List<int> meshVerts = new List<int>();
@@ -480,7 +479,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all face structures
         /// </summary>
-        private static List<Face> readFaces(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<Face> ReadFaces(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int faceCount = (int)lump.length / 104;
             List<Face> faces = new List<Face>();
@@ -519,7 +518,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Plane structures
         /// </summary>
-        private static List<Plane> readPlanes(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<Plane> ReadPlanes(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 16;
             List<Plane> elements = new List<Plane>();
@@ -541,7 +540,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Node structures
         /// </summary>
-        private static List<bsp_tree_node> readNodes(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<bsp_tree_node> ReadNodes(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 36;
             List<bsp_tree_node> elements = new List<bsp_tree_node>();
@@ -566,7 +565,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Leaf structures
         /// </summary>
-        private static List<Leaf> readLeaves(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<Leaf> ReadLeaves(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 48;
             List<Leaf> elements = new List<Leaf>();
@@ -596,7 +595,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Leaf Faces
         /// </summary>
-        private static List<long> readLeafFaces(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<long> ReadLeafFaces(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 4;
             List<long> elements = new List<long>();
@@ -615,7 +614,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Brushes
         /// </summary>
-        private static List<Brush> readBrushes(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<Brush> ReadBrushes(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 12;
             List<Brush> elements = new List<Brush>();
@@ -638,7 +637,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Leaf Brushes
         /// </summary>
-        private static List<long> readLeafBrushes(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<long> ReadLeafBrushes(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 4;
             List<long> elements = new List<long>();
@@ -657,7 +656,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Brush Sides
         /// </summary>
-        private static List<BrushSide> readBrushSides(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static List<BrushSide> ReadBrushSides(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             int count = (int)lump.length / 8;
             List<BrushSide> elements = new List<BrushSide>();
@@ -680,7 +679,7 @@ namespace Aletha.bsp
         /// <summary>
         /// Read all Vis Data
         /// </summary>
-        private static VisData readVisData(bsp_header_lump_t lump, BinaryStreamReader src)
+        private static VisData ReadVisData(bsp_header_lump_t lump, BinaryStreamReader src)
         {
             src.Seek(lump.offset);
             int vecCount = src.ReadInt32(); // ReadInt64
