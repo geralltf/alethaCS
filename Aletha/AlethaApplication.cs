@@ -147,16 +147,21 @@ namespace Aletha
 
                 xAngle = 0.0f;
 
+                xAngle = (xAngle / 360f) * MathHelper.TwoPi ;
+                zAngle = (zAngle / 360f) * MathHelper.TwoPi; // + MathHelper.Pi + MathHelper.PiOver4;
+
                 Vector3 rotation = new Vector3(xAngle, 0.0f, zAngle);
 
                 Vector3 origin = (Vector3)spawnPoint.Fields["origin"];
                 origin.Z += 30; // Start a little ways above the floor
 
+                camera.Reset();
+
                 camera.SetOrigin(origin, rotation);
 
                 camera.velocity = Vector3.Zero;
 
-                //camera.Reset();
+                
             }
         }
 
@@ -330,6 +335,7 @@ namespace Aletha
             float yAngle = (direction.Y);
 
 
+
             camera.ApplyYaw(xAngle);
             camera.ApplyPitch(yAngle);
             camera.ApplyRotation();
@@ -433,25 +439,41 @@ namespace Aletha
                 Quit();
             }
 
+            Vector3 lookat = QuaternionLib.Rotate(camera.Orientation, Vector3.UnitY);
+            Vector3 forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+            Vector3 up = Vector3.UnitZ;
+            Vector3 left = up.Cross(forward);
+            Vector3 right = up.Cross(camera.Direction);
+
             if (Keyboard[Key.W])
             {
-                direction += camera.Direction * Config.playerDirectionMagnitude;
+                //direction += camera.Direction * Config.playerDirectionMagnitude;
+                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                direction -= camera.Forward * Config.playerDirectionMagnitude;
+
                 translated = true;
             }
             if (Keyboard[Key.S])
             {
-                direction -= camera.Direction * Config.playerDirectionMagnitude;
+                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                direction += camera.Forward * Config.playerDirectionMagnitude;
+
+                //direction -= camera.Direction * Config.playerDirectionMagnitude;
                 translated = true;
             }
             if (Keyboard[Key.A])
             {
-                camera.Right = camera.Up.Cross(camera.Direction);
+                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                camera.Right = right;
+
                 direction += camera.Right * Config.playerDirectionMagnitude;
                 translated = true;
             }
             if (Keyboard[Key.D])
             {
-                camera.Right = camera.Up.Cross(camera.Direction);
+                camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
+                camera.Right = right;
+
                 direction -= camera.Right * Config.playerDirectionMagnitude;
                 translated = true;
             }
