@@ -525,22 +525,22 @@ namespace Aletha
             bool rotated = false;
             if (Keyboard[Key.Left])
             {
-                camera.ApplyYaw(-0.1f);
+                camera.ApplyYaw(-Config.turnMagnitude);
                 rotated = true;
             }
             if (Keyboard[Key.Right])
             {
-                camera.ApplyYaw(0.1f);
+                camera.ApplyYaw(Config.turnMagnitude);
                 rotated = true;
             }
             if (Keyboard[Key.Up])
             {
-                camera.ApplyPitch(-0.1f);
+                camera.ApplyPitch(-Config.turnMagnitude);
                 rotated = true;
             }
             if (Keyboard[Key.Down])
             {
-                camera.ApplyPitch(0.1f); 
+                camera.ApplyPitch(Config.turnMagnitude); 
                 rotated = true;
             }
 

@@ -5,6 +5,7 @@ using System.Text;
 using Aletha.bsp;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+using X3D.Engine;
 
 namespace Aletha
 {
@@ -237,6 +238,21 @@ namespace Aletha
 
         static void bindSkyMatrix(shader_prog_t shader, Matrix4 modelViewMat, Matrix4 projectionMat)
         {
+            Matrix4 model;
+            SceneCamera cam;
+            Matrix4 cameraTransl;
+            Matrix4 cameraRot;
+            Matrix4 MV;
+
+            model = Matrix4.Identity;
+            cam = AlethaApplication.camera;
+
+            cameraTransl = Matrix4.CreateTranslation(-cam.Position - new Vector3(0, 0, Config.playerHeight));
+
+            cameraRot = Matrix4.CreateFromQuaternion(cam.Orientation);
+
+            MV = (model * cameraTransl) * cameraRot;
+
             skyboxMat = modelViewMat; //mat4.set(modelViewMat, this.skyboxMat);
                                       //skyboxMat = Matrix4.Identity;
                                       //skyboxMat = new Matrix4(modelViewMat.Row0, modelViewMat.Row1, modelViewMat.Row2, modelViewMat.Row3);

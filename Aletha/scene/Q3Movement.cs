@@ -132,10 +132,7 @@ namespace Aletha
                 direction.Z *=  -1.0f;
             }
 
-            //Vector3 moveDir = camera.Orientation * direction;
             Vector3 moveDir = QuaternionLib.Rotate(camera.Orientation, direction);
-
-
 
             float speed = direction.Length * Config.q3movement_scale;
 
