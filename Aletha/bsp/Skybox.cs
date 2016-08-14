@@ -172,7 +172,7 @@ namespace Aletha
                 // If we have a skybox, render it first
                 if (shader != null && skyboxIndexBuffer != -1 && skyboxBuffer != -1)
                 {
-                    //bindSkySingleTexture(gl,time);
+                    //bindSkySingleTexture(time);
 
 
                     // SkyBox Buffers
@@ -200,7 +200,7 @@ namespace Aletha
                             q3bsp.setViewport(leftViewport);
 
                             //GL.DrawElements(RenderingContext.TRIANGLES, skyboxIndexCount, RenderingContext.UNSIGNED_SHORT, 0);
-                            GL.DrawElements(BeginMode.Triangles, skyboxIndexCount, DrawElementsType.UnsignedInt, 0);
+                            GL.DrawElements(BeginMode.Triangles, skyboxIndexCount, DrawElementsType.UnsignedShort, 0);
 
                         }
                         if (shader.stages.Count == 0)
@@ -212,7 +212,7 @@ namespace Aletha
 
                             GL.UseProgram(shaderProgram.program);
 
-                            bindSkyTexture(null, shaderProgram, time);
+                            //bindSkyTexture(null, shaderProgram, time);
 
                             skybox.bindSkyAttribs(shaderProgram);
 
@@ -223,8 +223,10 @@ namespace Aletha
 
                             GL.Disable(EnableCap.DepthTest);
 
-                            //GL.DrawElements(RenderingContext.TRIANGLES, skyboxIndexCount, RenderingContext.UNSIGNED_SHORT, 0);
-                            GL.DrawElements(BeginMode.Triangles, skyboxIndexCount, DrawElementsType.UnsignedInt, 0);
+
+                            //bindSkySingleTexture(time);
+
+                            GL.DrawElements(BeginMode.Triangles, skyboxIndexCount, DrawElementsType.UnsignedShort, 0);
 
                             GL.Enable(EnableCap.DepthTest);
                         }
@@ -239,12 +241,14 @@ namespace Aletha
                                       //skyboxMat = Matrix4.Identity;
                                       //skyboxMat = new Matrix4(modelViewMat.Row0, modelViewMat.Row1, modelViewMat.Row2, modelViewMat.Row3);
 
+            //skyboxMat = Matrix4.Identity * AlethaApplication.camera.GetWorldOrientation();
 
+            
 
             // Clear out the translation components
-            skyboxMat.M12 = 0.0f;
-            skyboxMat.M13 = 0.0f;
-            skyboxMat.M14 = 0.0f;
+            //skyboxMat.M12 = 0.0f;
+            //skyboxMat.M13 = 0.0f;
+            //skyboxMat.M14 = 0.0f;
 
             // Set uniforms
             GL.UniformMatrix4(shader.uniform["modelViewMat"], false, ref skyboxMat);
@@ -262,7 +266,7 @@ namespace Aletha
                                    Config.q3bsp_sky_vertex_stride,
                                    0);
 
-            if (shader.attrib["texCoord"] != -1)
+            if (shader.attrib.ContainsKey("texCoord"))
             {
                 GL.EnableVertexAttribArray(shader.attrib["texCoord"]);
                 GL.VertexAttribPointer(shader.attrib["texCoord"],
@@ -271,6 +275,40 @@ namespace Aletha
                                        false,
                                        Config.q3bsp_sky_vertex_stride,
                                        3 * 4);
+            }
+
+
+            if (shader.attrib.ContainsKey("lightCoord"))
+            {
+                GL.EnableVertexAttribArray(shader.attrib["lightCoord"]);
+                GL.VertexAttribPointer(shader.attrib["lightCoord"],
+                                       2,
+                                       VertexAttribPointerType.Float,
+                                       false,
+                                       Config.q3bsp_vertex_stride,
+                                       5 * sizeof(float));
+            }
+
+            if (shader.attrib.ContainsKey("normal"))
+            {
+                GL.EnableVertexAttribArray(shader.attrib["normal"]);
+                GL.VertexAttribPointer(shader.attrib["normal"],
+                    3,
+                    VertexAttribPointerType.Float,
+                    false,
+                    Config.q3bsp_vertex_stride,
+                    7 * sizeof(float));
+            }
+
+            if (shader.attrib.ContainsKey("color"))
+            {
+                GL.EnableVertexAttribArray(shader.attrib["color"]);
+                GL.VertexAttribPointer(shader.attrib["color"],
+                    4,
+                    VertexAttribPointerType.Float,
+                    false,
+                    Config.q3bsp_vertex_stride,
+                    10 * sizeof(float));
             }
         }
 

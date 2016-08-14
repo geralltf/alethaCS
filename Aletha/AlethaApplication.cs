@@ -451,7 +451,6 @@ namespace Aletha
             {
                 if (Keyboard[Key.W])
                 {
-                    //direction += camera.Direction * Config.playerDirectionMagnitude;
                     camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
                     direction -= camera.Forward * Config.playerDirectionMagnitude;
 
@@ -462,7 +461,6 @@ namespace Aletha
                     camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
                     direction += camera.Forward * Config.playerDirectionMagnitude;
 
-                    //direction -= camera.Direction * Config.playerDirectionMagnitude;
                     translated = true;
                 }
                 if (Keyboard[Key.A])
@@ -471,6 +469,7 @@ namespace Aletha
                     camera.Right = right;
 
                     direction += camera.Right * Config.playerDirectionMagnitude;
+
                     translated = true;
                 }
                 if (Keyboard[Key.D])
@@ -479,6 +478,7 @@ namespace Aletha
                     camera.Right = right;
 
                     direction -= camera.Right * Config.playerDirectionMagnitude;
+
                     translated = true;
                 }
             }

@@ -16,11 +16,9 @@ namespace Aletha
 
         public ShaderTokenizer(String src)
         {
-
-
             src = strip_comments(src);
 
-            this.tokens = tokenise_shader(src);
+            this.tokens = Tokenise(src);
 
             this.offset = 0;
         }
@@ -48,7 +46,8 @@ namespace Aletha
             return result;
         }
 
-        private List<string> tokenise_shader (string shader_src)
+        // TODO: classify tokens as a Token type, otherwise a prescribed value type
+        private List<string> Tokenise (string shader_src) 
         {
             //this.tokens = src.match(/[^\s\n\r\"]+/mg);
             //RegExp reg = new RegExp("[^\s\n\r\"]+");

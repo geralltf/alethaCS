@@ -21,10 +21,10 @@ namespace Aletha.bsp
             Matrix4 cameraTransl;
             Matrix4 cameraRot;
             Matrix4 MV;
-
+            
             model = Matrix4.Identity;
             cam = AlethaApplication.camera;
-
+            
             cameraTransl = Matrix4.CreateTranslation(-cam.Position - new Vector3(0, 0, Config.playerHeight));
 
             cameraRot = Matrix4.CreateFromQuaternion(cam.Orientation);

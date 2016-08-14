@@ -48,7 +48,7 @@ namespace Aletha
             }
             if (e.Key == Key.I)
             {
-                camera.invert();
+                camera.Invert();
             }
         }
 

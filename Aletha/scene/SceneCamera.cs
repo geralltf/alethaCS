@@ -215,7 +215,7 @@ namespace X3D.Engine
             Vector3 PlayerPosition;
 
             PlayerPosition = new Vector3(Position.X, Position.Y + Config.playerHeight, Position.Z);
-            
+
             Look = PlayerPosition + (Direction) * 1.0f;
 
             outm = Matrix4.LookAt(PlayerPosition, Look, Up);
@@ -244,6 +244,11 @@ namespace X3D.Engine
             Vector3 roll_axis = forward + Up;
 
             Orientation = QuaternionLib.QuaternionFromEulerAnglesRad (0, -camera_yaw, -camera_pitch);
+
+            if (inverted)
+            {
+                Orientation *= QuaternionLib.QuaternionFromEulerAnglesRad(0, 0, -MathHelpers.PI);
+            }
         }
 
 
@@ -252,47 +257,9 @@ namespace X3D.Engine
         //	return MatrixExtensions.LookAt(eye,center,up, this.Matrix);
         //}
 
-        public void invert()
+        public void Invert()
         {
-            InvNeg();
-        }
-
-        public bool InvNeg()
-        {
-            if (inverted)
-            {
-                return InvPos();
-            }
-
-            var cam = this.Position;
-            Vector3 moveTo = cam;
-            Vector3 pos = Vector3.UnitY * -1.0f;
-
-            moveTo = moveTo + pos;
-            Position = moveTo;
-
-            crouched = true;
-
-            return true;
-        }
-
-        public bool InvPos()
-        {
-            if (!inverted)
-            {
-                return InvNeg();
-            }
-
-            var cam = this.Position; // clone
-            Vector3 moveTo = cam;
-            Vector3 pos = Vector3.UnitY;
-
-            moveTo = moveTo + pos;
-            this.Position = moveTo;
-
-            crouched = false;
-
-            return true;
+            inverted = !inverted;
         }
 
         public void update(int frame_time)

@@ -247,6 +247,7 @@ namespace Aletha.bsp
             Thread th;
             ThreadStart ts;
             shader_p surface;
+            int i;
 
             if (surfaces == null) { return; }
 
@@ -255,7 +256,7 @@ namespace Aletha.bsp
                 onsurfaces(surfaces);
             }
 
-            for (int i = 0; i < surfaces.Count; ++i)
+            for (i = 0; i < surfaces.Count; ++i)
             {
                 surface = surfaces[i];
 
@@ -268,10 +269,8 @@ namespace Aletha.bsp
             }
 
             /* FAST dirty async code */
-            //Timer timer;
 
             ts = new ThreadStart(() =>
-            //timer = new Timer((object state) =>
             {
                 OpenTK.Graphics.IGraphicsContext context;
                 //Stack<shader_p> work_items;
@@ -287,6 +286,8 @@ namespace Aletha.bsp
 
                 while (processSurfaces)
                 {
+                    // Sort any surfaces found in unshadedSurfaces in correct model, effect, or default bins as discovered
+
                     if (unshadedSurfaces.Count == 0)
                     {
                         // Have we processed all surfaces?
@@ -363,8 +364,6 @@ namespace Aletha.bsp
                 }
 
                 Console.WriteLine("Processed surfaces");
-
-            //}, null, 1, 10);
             });
 
 
@@ -494,8 +493,11 @@ namespace Aletha.bsp
 
         public static void render_effect_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
+            int i;
+            int j;
+
             // Effect surfaces
-            for (int i = 0; i < effectSurfaces.Count; ++i)
+            for (i = 0; i < effectSurfaces.Count; ++i)
             {
                 shader_p surface = effectSurfaces[i];
                 if (surface.elementCount == 0 || surface.visible != true) { continue; }
@@ -512,7 +514,7 @@ namespace Aletha.bsp
 
                 if (!glshading.setShader(shader)) { continue; }
 
-                for (int j = 0; j < shader.stages.Count; ++j)
+                for (j = 0; j < shader.stages.Count; ++j)
                 {
                     stage_gl stage = shader.stages[j];
 
@@ -543,6 +545,8 @@ namespace Aletha.bsp
         }
         public static void render_model_surfaces(Matrix4 leftViewMat, Matrix4 leftProjMat, Viewport leftViewport, float time)
         {
+            int i;
+
             // Setup State
             shader_gl shader = modelSurfaces[0].shader;
             glshading.setShader(shader);
@@ -554,7 +558,7 @@ namespace Aletha.bsp
             BspOpenglBinders.BindShaderMatrix(shaderProgram, leftViewMat, leftProjMat);
             setViewport(leftViewport);
 
-            for (int i = 0; i < modelSurfaces.Count; ++i)
+            for (i = 0; i < modelSurfaces.Count; ++i)
             {
                 shader_p surface = modelSurfaces[i];
                 stage_gl stage2 = surface.shader.stages[0];

@@ -274,6 +274,8 @@ namespace Aletha
 
         public void loadTexture(shader_gl shader, shader_p surface, stage_gl stage)
         {
+            int i;
+
             if (shader.sky)
             {
                 Console.WriteLine("[skybox] {0}", shader.name);
@@ -300,7 +302,7 @@ namespace Aletha
             {
                 stage.animTexture = new List<int>();
 
-                for (int i = 0; i < stage.animMaps.Count; ++i)
+                for (i = 0; i < stage.animMaps.Count; ++i)
                 {
                     if (i > stage.animTexture.Count - 1)
                     {
@@ -321,14 +323,15 @@ namespace Aletha
             {
 
 
-                //if(shader.sky == false)
-                //{
-                String url = Config.q3bsp_base_folder + "/" + stage.map;
-                loadTextureUrl(stage, url, (int texture) =>
+                if (shader.sky == false)
                 {
-                    stage.texture = texture;
-                });
-                //}
+                    string url = Config.q3bsp_base_folder + "/" + stage.map;
+
+                    loadTextureUrl(stage, url, (int texture) =>
+                    {
+                        stage.texture = texture;
+                    });
+                }
             }
         }
 
