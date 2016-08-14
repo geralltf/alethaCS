@@ -59,6 +59,11 @@ namespace Aletha
 
         public static float turnMagnitude = 0.04f;
 
+        public static float walkVelocityScale = 1.0f;
+
+        public static float walkVelocityFast = 1.4f;
+
+
         // Some movement constants ripped from the Q3 Source code
         public static float q3movement_stopspeed = 100.0f;
 		public static float q3movement_duckScale = 0.25f;

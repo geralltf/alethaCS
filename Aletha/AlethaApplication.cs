@@ -37,6 +37,7 @@ namespace Aletha
         bool? lockMouseCursor = true;
         private bool fastFlySpeed = false;
         private bool slowFlySpeed = false;
+        private bool fastWalkSpeed = false;
         public static float playerDirectionMagnitude = 1.0f;
         public static float movementSpeed = 1.0f;
 
@@ -424,11 +425,16 @@ namespace Aletha
 
             Vector3 direction = Vector3.Zero;
             bool translated = false;
+            float walkMovementSpeed;
 
             slowFlySpeed = Keyboard[Key.AltLeft];
             fastFlySpeed = Keyboard[Key.ShiftLeft];
             movementSpeed = fastFlySpeed ? 10.0f : 1.0f;
             movementSpeed = slowFlySpeed ? 0.01f : movementSpeed;
+
+            fastWalkSpeed = Keyboard[Key.ShiftLeft];
+            walkMovementSpeed = fastWalkSpeed ? Config.walkVelocityFast : Config.walkVelocityScale;
+            camera.walkMovementSpeed = walkMovementSpeed;
 
             if (Keyboard[Key.Escape] || Keyboard[Key.Q])
             {
@@ -452,14 +458,14 @@ namespace Aletha
                 if (Keyboard[Key.W])
                 {
                     camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-                    direction -= camera.Forward * Config.playerDirectionMagnitude;
+                    direction -= camera.Forward * (Config.playerDirectionMagnitude * walkMovementSpeed);
 
                     translated = true;
                 }
                 if (Keyboard[Key.S])
                 {
                     camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
-                    direction += camera.Forward * Config.playerDirectionMagnitude;
+                    direction += camera.Forward * (Config.playerDirectionMagnitude * walkMovementSpeed);
 
                     translated = true;
                 }
@@ -468,7 +474,7 @@ namespace Aletha
                     camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
                     camera.Right = right;
 
-                    direction += camera.Right * Config.playerDirectionMagnitude;
+                    direction += camera.Right * (Config.playerDirectionMagnitude * walkMovementSpeed);
 
                     translated = true;
                 }
@@ -477,7 +483,7 @@ namespace Aletha
                     camera.Forward = new Vector3(lookat.X, 0, lookat.Z).Normalized();
                     camera.Right = right;
 
-                    direction -= camera.Right * Config.playerDirectionMagnitude;
+                    direction -= camera.Right * (Config.playerDirectionMagnitude * walkMovementSpeed);
 
                     translated = true;
                 }

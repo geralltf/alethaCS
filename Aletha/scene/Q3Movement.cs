@@ -4,6 +4,7 @@ using OpenTK;
 using X3D.Engine;
 using System.Collections;
 using System.Collections.Generic;
+using X3D;
 
 namespace Aletha
 {
@@ -96,11 +97,11 @@ namespace Aletha
 
             this.groundCheck();
 
-            if(direction != Vector3.Zero)
+            if (direction != Vector3.Zero)
             {
-                direction.Normalize();
+                direction = MathHelpers.Clamp(direction, -camera.walkMovementSpeed, camera.walkMovementSpeed); // direction.Normalize();
             }
-                
+
 
             if (camera.onGround)
             {

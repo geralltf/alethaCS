@@ -49,6 +49,24 @@ namespace X3D
 
         #region Clamping
 
+        /// <summary>
+        /// Clamp a vector between the specified value range.
+        /// Similar to Vector Normalize operation, 
+        /// except constraints are adjustable.
+        /// </summary>
+        public static Vector3 Clamp(Vector3 value, float min, float max)
+        {
+            Vector3 result;
+
+            result = new Vector3(
+                value.X > max ? max : (value.X < min ? min : value.X),
+                value.Y > max ? max : (value.Y < min ? min : value.Y),
+                value.Z > max ? max : (value.Z < min ? min : value.Z)
+            );
+
+            return result;
+        }
+
         public static double Clamp(double value, double min, double max)
         {
             return value > max ? max : (value < min ? min : value);

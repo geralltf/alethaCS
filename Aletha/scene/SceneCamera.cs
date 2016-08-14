@@ -60,6 +60,8 @@ namespace X3D.Engine
         public float max_pitch = 5.0f;
         public float max_yaw = 5.0f;
 
+        public float walkMovementSpeed = Config.walkVelocityScale;
+
         public float playerHeight = 0.0f;
         public int Width;
         public int Height;
