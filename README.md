@@ -6,22 +6,22 @@ Quake 3 port to C# for educational purposes
 NAVIGATION
 
 
-W Forward
+> W Forward
 
-S Backward
+> S Backward
 
-A Left
+> A Left
 
-D Right
+> D Right
 
 
-Up arrow    Pitch -
+> Up arrow    Pitch -
 
-Down arrow  Pitch +
+> Down arrow  Pitch +
 
-Left arrow  Yaw -
+> Left arrow  Yaw -
 
-Right arrow Yaw +
+> Right arrow Yaw +
 
 
 
@@ -29,6 +29,6 @@ Right arrow Yaw +
 OPTIONS
 
 
-F1 toggle between walk and fly navigation types (/w collision | /w no clipping)
+> F1 toggle between walk and fly navigation types (/w collision | /w no clipping)
 
-F  toggle fullscreen 
+> F  toggle fullscreen 
