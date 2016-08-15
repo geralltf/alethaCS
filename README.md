@@ -30,4 +30,5 @@ OPTIONS
 
 
 F1 toggle between walk and fly navigation types (/w collision | /w no clipping)
+
 F  toggle fullscreen 
