@@ -2,6 +2,7 @@
 Quake 3 port to C# for educational purposes
 
 
+
 NAVIGATION
 
 
@@ -23,7 +24,10 @@ Left arrow  Yaw -
 Right arrow Yaw +
 
 
+
+
 OPTIONS
+
 
 F1 toggle between walk and fly navigation types (/w collision | /w no clipping)
 F  toggle fullscreen 
