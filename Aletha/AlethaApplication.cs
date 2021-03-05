@@ -379,7 +379,7 @@ namespace Aletha
 
                 if (q3bsp.skybox_env != null)
                 {
-                    q3bsp.skybox_env.Render(frameTime, leftViewport, leftViewMat, camera.Projection);
+                    //q3bsp.skybox_env.Render(frameTime, leftViewport, leftViewMat, camera.Projection);
                 }
 
                 q3bsp.Render(leftViewMat, camera.Projection, leftViewport, frameTime);

@@ -80,19 +80,24 @@ namespace Aletha
                         Rescale(ref image, newSize);
 
 
-                    AlethaApplication.incReqests();
-                        AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
+                    //AlethaApplication.incReqests();
+                    //    AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
 
-                        onloadComplete(texture, image);
+                    //    onloadComplete(texture, image);
 
-                        Console.WriteLine(url);
+                    //    Console.WriteLine(url);
                     //}
                     //catch
                     //{
                     //    Console.WriteLine("[warning] could not find texture '{0}'", url);
                     //}
             }
+                AlethaApplication.incReqests();
+                AlethaApplication.update_progress_bar(AlethaApplication.request_number, url);
 
+                onloadComplete(texture, image);
+
+                Console.WriteLine(url);
 
                 //fetch_update(url);
             }

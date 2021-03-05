@@ -270,105 +270,105 @@ namespace Aletha.bsp
 
             /* FAST dirty async code */
 
-            ts = new ThreadStart(() =>
-            {
-                OpenTK.Graphics.IGraphicsContext context;
-                //Stack<shader_p> work_items;
-                bool processSurfaces;
-
-                context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
-                context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
-                //work_items = new Stack<shader_p>(unshadedSurfaces);
-                processSurfaces = true;
-
-                // PROCESS SURFACE SHADERS
-                // as they come in until there are none left
-
-                while (processSurfaces)
-                {
-                    // Sort any surfaces found in unshadedSurfaces in correct model, effect, or default bins as discovered
-
-                    if (unshadedSurfaces.Count == 0)
-                    {
-                        // Have we processed all surfaces?
-                        // Sort to ensure correct order of transparent objects
-
-                        effectSurfaces.Sort((shader_p a, shader_p b) =>
-                        {
-                            int order = a.shader.sort - b.shader.sort;
-                            // TODO: Sort by state here to cut down on changes?
-                            return order; //(order == 0 ? 1 : order);
-                        });
-
-                        processSurfaces = false;
-                    }
-
-                    {
-                        String shader_name;
-                        shader_gl shader;
-
-
-                        if (unshadedSurfaces.Count != 0)
-                        {
-                            surface = unshadedSurfaces.Last();
-                            unshadedSurfaces.RemoveAt(unshadedSurfaces.Count-1);
-
-                            //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
-
-                            shader_name = surface.shaderName;
-                            //shader_name = shader_name.startsWith('"')?shader_name.substring(1):shader_name; // BUG
-
-                            if (q3bsp.shaders.ContainsKey(shader_name))
-                            {
-                                shader = q3bsp.shaders[shader_name];
-                            }
-                            else
-                            {
-                                shader = null;
-                            }
-
-                            //shader_gl skyshader = q3bsp.shaders['textures/atcs/skybox_s'];
-
-                            if (shader == null)
-                            {
-                                surface.shader = glshading.buildDefault(surface);
-
-                                if (surface.geomType == 3)
-                                {
-                                    surface.shader.model = true;
-                                    modelSurfaces.Add(surface);
-                                }
-                                else
-                                {
-                                    defaultSurfaces.Add(surface);
-                                }
-                            }
-                            else
-                            {
-                                surface.shader = shader;
-
-                                if (shader.sky == true)
-                                {
-                                    skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
-                                }
-                                else
-                                {
-                                    effectSurfaces.Add(surface);
-                                }
-
-                                glshading.loadShaderMaps(surface, shader);
-                            }
-                        }
-
-                    }
-                }
-
-                Console.WriteLine("Processed surfaces");
-            });
-
-
+            ts = new ThreadStart(processSurfacesThread);
             th = new Thread(ts);
             th.Start();
+        }
+
+        private static void processSurfacesThread()
+        {
+            shader_p surface;
+            bool processSurfaces;
+
+            // Any method called within this thread that accesses GL must update the context like this before GL calls can be made:
+            var context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
+            context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
+
+            processSurfaces = true;
+
+            // PROCESS SURFACE SHADERS
+            // as they come in until there are none left
+
+            while (processSurfaces)
+            {
+                // Sort any surfaces found in unshadedSurfaces in correct model, effect, or default bins as discovered
+
+                if (unshadedSurfaces.Count == 0)
+                {
+                    // Have we processed all surfaces?
+                    // Sort to ensure correct order of transparent objects
+
+                    effectSurfaces.Sort((shader_p a, shader_p b) =>
+                    {
+                        int order = a.shader.sort - b.shader.sort;
+                        // TODO: Sort by state here to cut down on changes?
+                        return order; //(order == 0 ? 1 : order);
+                    });
+
+                    processSurfaces = false;
+                }
+
+                {
+                    String shader_name;
+                    shader_gl shader;
+
+
+                    if (unshadedSurfaces.Count != 0)
+                    {
+                        surface = unshadedSurfaces.Last();
+                        unshadedSurfaces.RemoveAt(unshadedSurfaces.Count - 1);
+
+                        //shader_p surface = unshadedSurfaces.RemoveAt(0); // var surface = unshadedSurfaces.shift();
+
+                        shader_name = surface.shaderName;
+                        //shader_name = shader_name.startsWith('"')?shader_name.substring(1):shader_name; // BUG
+
+                        if (q3bsp.shaders.ContainsKey(shader_name))
+                        {
+                            shader = q3bsp.shaders[shader_name];
+                        }
+                        else
+                        {
+                            shader = null;
+                        }
+
+                        //shader_gl skyshader = q3bsp.shaders['textures/atcs/skybox_s'];
+
+                        if (shader == null)
+                        {
+                            surface.shader = glshading.buildDefault(surface);
+
+                            if (surface.geomType == 3)
+                            {
+                                surface.shader.model = true;
+                                modelSurfaces.Add(surface);
+                            }
+                            else
+                            {
+                                defaultSurfaces.Add(surface);
+                            }
+                        }
+                        else
+                        {
+                            glshading.loadShaderMaps(surface, shader);
+
+                            surface.shader = shader;
+
+                            if (shader.sky == true)
+                            {
+                                skybox.skyShader = shader; // Sky does not get pushed into effectSurfaces. It's a separate pass
+                            }
+                            else
+                            {
+                                effectSurfaces.Add(surface);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            Console.WriteLine("Processed surfaces");
         }
 
         // Update which portions of the map are visible based on position
@@ -480,11 +480,14 @@ namespace Aletha.bsp
                 for (i = 0; i < defaultSurfaces.Count; ++i)
                 {
                     shader_p surface = defaultSurfaces[i];
-                    stage_gl stage2 = surface.shader.stages[0];
-                    GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
-                    GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
+                    //stage_gl stage2 = surface.shader.stages[0];
+                    foreach(stage_gl stage2 in surface.shader.stages)
+                    {
+                        GL.ActiveTexture(TextureUnit.Texture0);
+                        GL.BindTexture(TextureTarget.Texture2D, stage2.texture);
+                        GL.DrawElements(BeginMode.Triangles, surface.elementCount, DrawElementsType.UnsignedShort, surface.indexOffset);
+                    }
                 }
-
             }
         }
 
@@ -507,15 +510,41 @@ namespace Aletha.bsp
                     shader = glshading.defaultShader;
                 }
 
-                shader = glshading.defaultShader; // test to show that effect shaders are buggy. Later remove this line to use the effect shader properly.
+                //shader = glshading.defaultShader; // test to show that effect shaders are buggy. Later remove this line to use the effect shader properly.
+
+                if(shader.name == "textures/atcs/force_field_s")
+                {
+                    //var tex = shader.stages[0].texture;
+                    //shader = glshading.defaultShader;
+                    //shader.stages[0].texture = tex;
+
+                    var tmp = shader;
+                    shader = glshading.defaultShader;
+                    shader.stages[0].texture = tmp.stages[0].texture;
+                }
 
                 if (!glshading.setShader(shader)) { continue; }
 
                 for (j = 0; j < shader.stages.Count; ++j)
                 {
                     stage_gl stage = shader.stages[j];
+                    shader_prog_t shaderProgram;
 
-                    shader_prog_t shaderProgram = glshading.setShaderStage(shader, stage, time);
+                    //if (stage.shaderName == "textures/atcs/force_field_s")
+                    //{
+                    //    //shaderProgram = glshading.setShaderStage_EffectDEBUG(shader, stage, time);
+                    //    shaderProgram = glshading.defaultProgram;
+                    //    GL.UseProgram(shaderProgram.program);
+                    //}
+                    //else
+                    //{
+                    //    shaderProgram = glshading.setShaderStage(shader, stage, time);
+                    //}
+
+                    //shaderProgram = glshading.defaultProgram;
+                    //GL.UseProgram(shaderProgram.program);
+
+                    shaderProgram = glshading.setShaderStage(shader, stage, time);
 
                     if (shaderProgram == null) { continue; }
 

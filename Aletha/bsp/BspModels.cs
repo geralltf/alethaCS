@@ -155,6 +155,7 @@ namespace Aletha.bsp
     }
     public class stage_gl
     {
+        public string shaderName;
         public string map;
         public double? animFreq;
         public int texture;

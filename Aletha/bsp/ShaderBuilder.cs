@@ -135,7 +135,7 @@ namespace Aletha
             switch (wf.funcName)
             {
                 case "sin":
-                    this.statements.Add("float " + name + " = " + toStringAsFixed(wf.@base, 4) + " + sin((" + wf.phase + " + " + timeVar + " * " + toStringAsFixed(wf.freq, 4) + ") * 6.283) * " + toStringAsFixed(wf.amp, 4) + ";");
+                    this.statements.Add("float " + name + " = " + toStringAsFixed(wf.@base, 4) + " + sin((" + toStringAsFixed(double.Parse(wf.phase.ToString()), 4) + " + " + timeVar + " * " + toStringAsFixed(wf.freq, 4) + ") * 6.283) * " + toStringAsFixed(wf.amp, 4) + ";");
                     return;
                 case "square": funcName = "square"; this.addSquareFunc(); break;
                 case "triangle": funcName = "triangle"; this.addTriangleFunc(); break;
@@ -145,14 +145,14 @@ namespace Aletha
                     this.statements.Add("float " + name + " = 0.0;");
                     return;
             }
-            this.statements.Add("float " + name + " = " + toStringAsFixed(wf.@base, 4) + " + " + funcName + "(" + wf.phase + " + " + timeVar + " * " + toStringAsFixed(wf.freq, 4) + ") * " + toStringAsFixed(wf.amp, 4) + ";");
+            this.statements.Add("float " + name + " = " + toStringAsFixed(wf.@base, 4) + " + " + funcName + "(" + toStringAsFixed(double.Parse(wf.phase.ToString()), 4) + " + " + timeVar + " * " + toStringAsFixed(wf.freq, 4) + ") * " + toStringAsFixed(wf.amp, 4) + ";");
         }
 
         public static string toStringAsFixed(double value, int fractionDigits)
         {
             string result;
 
-            result = (Math.Round(value, fractionDigits)).ToString();
+            result = (Math.Round(value, fractionDigits)).ToString("0.0");
 
 
             return result;

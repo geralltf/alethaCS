@@ -15,6 +15,9 @@ namespace Aletha
 
         public static void LoadComplete(int index, TextureTarget target, OnTextueLoad onloadComplete) // OnSkymapLoadComplete
         {
+            var context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
+            context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
+
             int skybox = GL.GenTexture();
             index = skybox;
             skymap = skybox;

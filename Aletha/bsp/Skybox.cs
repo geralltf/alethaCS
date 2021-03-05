@@ -104,6 +104,9 @@ namespace Aletha
         {
             skybox sky = new skybox();
 
+            var context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
+            context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
+
             // determine type of skybox: number of textures to load
 
             //sky.type = skybox_type.one_tex;
@@ -213,8 +216,10 @@ namespace Aletha
                             GL.UseProgram(shaderProgram.program);
 
                             //bindSkyTexture(null, shaderProgram, time);
-
-                            GL.Uniform1(shaderProgram.uniform["texture"], 0);
+                            if(shaderProgram.uniform.ContainsKey("texture"))
+                            {
+                                GL.Uniform1(shaderProgram.uniform["texture"], 0);
+                            }
 
                             bindSkySingleTexture(time);
 

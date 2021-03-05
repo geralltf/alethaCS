@@ -22,7 +22,7 @@ namespace Aletha
         private Matrix4 texMat;
         public shader_prog_t defaultProgram;
         private shader_prog_t modelProgram;
-        private bool shader_source_tracing = false;
+        private bool shader_source_tracing = true;
 
         public ShaderCompiler()
         {
@@ -258,10 +258,13 @@ namespace Aletha
             {
                 stage_gl stage = shader.stages[i];
 
+                stage.shaderName = shader.name;
+
                 if (stage.map != null)
                 {
                     loadTexture(shader, surface, stage);
                 }
+
                 if (stage.shaderSrc != null && stage.program == null)
                 {
                     Console.WriteLine("Compiling " + shader.name);
@@ -356,6 +359,7 @@ namespace Aletha
 
                   GL.BindTexture(TextureTarget.Texture2D, texture);
                   GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData.Scan0);
+
                   GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (isPowerOf2 ? (int)TextureMinFilter.LinearMipmapNearest : (int)TextureMinFilter.Linear));
                   GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 
@@ -366,6 +370,8 @@ namespace Aletha
                   }
 
                   if (isPowerOf2) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+                  GL.BindTexture(TextureTarget.Texture2D, 0);
 
                   onload(texture);
               });
@@ -383,6 +389,9 @@ namespace Aletha
             pixels.Add((byte)color.W);
 
             data = pixels.ToArray();
+
+            var context = new OpenTK.Graphics.GraphicsContext(AlethaApplication.GraphicsMode, AlethaApplication.NativeWindowContext.WindowInfo);
+            context.MakeCurrent(AlethaApplication.NativeWindowContext.WindowInfo);
 
             int texture = GL.GenTexture();
 
@@ -484,7 +493,103 @@ namespace Aletha
                 if (texture == -1) texture = defaultTexture;
 
                 GL.ActiveTexture(TextureUnit.Texture0);
-                GL.Uniform1(program.uniform["texture"], 0);
+                if(program.uniform.ContainsKey("texture"))
+                {
+                    GL.Uniform1(program.uniform["texture"], 0);
+                }
+                GL.BindTexture(TextureTarget.Texture2D, texture);
+            }
+
+            if (program.uniform.ContainsKey("lightmap"))
+            {
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.Uniform1(program.uniform["lightmap"], 1);
+                GL.BindTexture(TextureTarget.Texture2D, q3bsp.lightmap);
+            }
+
+            if (program.uniform.ContainsKey("time"))
+            {
+                GL.Uniform1(program.uniform["time"], time);
+            }
+
+            return program;
+        }
+
+        public shader_prog_t setShaderStage_EffectDEBUG(shader_gl shader, stage_gl shaderStage, float time)
+        {
+            shader_prog_t program;
+
+            stage_gl stage = shaderStage;
+
+            if (stage == null)
+            {
+                stage = defaultShader.stages[0];
+            }
+
+            if (stage.animFreq.HasValue && stage.animFreq != 0)
+            {
+                // Texture animation seems like a natural place for setInterval, but that approach has proved error prone. 
+                // It can easily get out of sync with other effects (like rgbGen pulses and whatnot) which can give a 
+                // jittery or flat out wrong appearance. Doing it this way ensures all effects are synced.
+                float ff = time * (float)stage.animFreq.Value;
+
+                //var animFrame = ff.floor() % stage.animTexture.length;
+                stage.texture = stage.animTexture[stage.animFrame]; // stage.animTexture.animFrame;
+            }
+
+            GL.BlendFunc((BlendingFactorSrc)stage.blendSrc, (BlendingFactorDest)stage.blendDest);
+
+            if (stage.depthWrite == true && shader.sky == false)
+            {
+                GL.DepthMask(true);
+            }
+            else
+            {
+                GL.DepthMask(false);
+            }
+
+            GL.DepthFunc(stage.depthFunc);
+
+            program = stage.program;
+            int prog = program != null ? program.program : -1;
+
+            if (prog == -1)
+            {
+                if (shader.model == true)
+                {
+                    program = modelProgram;
+                    prog = program.program;
+                }
+                else
+                {
+                    program = defaultProgram;
+                    prog = program.program;
+                }
+            }
+
+            //program = defaultProgram;
+            //prog = program.program;
+
+            GL.UseProgram(prog);
+
+            if (shader.sky == true)
+            {
+                //q3bsp.skybox_env.bindSkyTexture(stage, program, time);
+                //var a = 3;
+
+            }
+            else
+            {
+                int texture = stage.texture;
+                if (texture == -1) texture = defaultTexture;
+
+                //texture = defaultTexture;
+
+                GL.ActiveTexture(TextureUnit.Texture0);
+                if (program.uniform.ContainsKey("texture"))
+                {
+                    GL.Uniform1(program.uniform["texture"], 0);
+                }
                 GL.BindTexture(TextureTarget.Texture2D, texture);
             }
 
